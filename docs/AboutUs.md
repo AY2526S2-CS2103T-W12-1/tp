@@ -50,11 +50,11 @@ You can reach us at the email `seer[at]comp.nus.edu.sg`
 * Role: Developer
 * Responsibilities: Dev Ops + Threading
 
-### James Doe
+### Syaza Kurnia
 
-<img src="images/johndoe.png" width="200px">
+<img src="images/twobitnoodles.png" width="200px">
 
-[[github](http://github.com/johndoe)]
+[[github](http://github.com/twobitnoodles)]
 [[portfolio](team/johndoe.md)]
 
 * Role: Developer
