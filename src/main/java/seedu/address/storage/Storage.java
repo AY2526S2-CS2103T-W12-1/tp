@@ -23,6 +23,12 @@ public interface Storage extends AddressBookStorage, UserPrefsStorage {
     @Override
     Path getAddressBookFilePath();
 
+    Path getPatientsFilePath();
+
+    Path getDoctorsFilePath();
+
+    Path getScheduleFilePath();
+
     @Override
     Optional<ReadOnlyAddressBook> readAddressBook() throws DataLoadingException;
 

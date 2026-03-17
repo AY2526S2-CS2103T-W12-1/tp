@@ -18,13 +18,23 @@ public class StorageManager implements Storage {
 
     private static final Logger logger = LogsCenter.getLogger(StorageManager.class);
     private AddressBookStorage addressBookStorage;
+    private AddressBookStorage patientDataStorage;
+    private AddressBookStorage doctorDataStorage;
+    private AddressBookStorage scheduleDataStorage;
     private UserPrefsStorage userPrefsStorage;
 
     /**
      * Creates a {@code StorageManager} with the given {@code AddressBookStorage} and {@code UserPrefStorage}.
      */
-    public StorageManager(AddressBookStorage addressBookStorage, UserPrefsStorage userPrefsStorage) {
+    public StorageManager(AddressBookStorage addressBookStorage,
+                          AddressBookStorage patientDataStorage,
+                          AddressBookStorage doctorDataStorage,
+                          AddressBookStorage scheduleDataStorage,
+                          UserPrefsStorage userPrefsStorage) {
         this.addressBookStorage = addressBookStorage;
+        this.patientDataStorage = patientDataStorage;
+        this.doctorDataStorage = doctorDataStorage;
+        this.scheduleDataStorage = scheduleDataStorage;
         this.userPrefsStorage = userPrefsStorage;
     }
 
@@ -51,6 +61,21 @@ public class StorageManager implements Storage {
     @Override
     public Path getAddressBookFilePath() {
         return addressBookStorage.getAddressBookFilePath();
+    }
+
+    @Override
+    public Path getPatientsFilePath() {
+        return patientDataStorage.getAddressBookFilePath();
+    }
+
+    @Override
+    public Path getDoctorsFilePath() {
+        return doctorDataStorage.getAddressBookFilePath();
+    }
+
+    @Override
+    public Path getScheduleFilePath() {
+        return scheduleDataStorage.getAddressBookFilePath();
     }
 
     @Override

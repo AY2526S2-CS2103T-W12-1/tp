@@ -58,7 +58,11 @@ public class MainApp extends Application {
         UserPrefsStorage userPrefsStorage = new JsonUserPrefsStorage(config.getUserPrefsFilePath());
         UserPrefs userPrefs = initPrefs(userPrefsStorage);
         AddressBookStorage addressBookStorage = new JsonAddressBookStorage(userPrefs.getAddressBookFilePath());
-        storage = new StorageManager(addressBookStorage, userPrefsStorage);
+        AddressBookStorage patientDataStorage = new JsonAddressBookStorage(userPrefs.getPatientsFilePath());
+        AddressBookStorage doctorDataStorage = new JsonAddressBookStorage(userPrefs.getDoctorsFilePath());
+        AddressBookStorage scheduleDataStorage = new JsonAddressBookStorage(userPrefs.getScheduleFilePath());
+        storage = new StorageManager(addressBookStorage, patientDataStorage,
+                doctorDataStorage, scheduleDataStorage, userPrefsStorage);
 
         model = initModelManager(storage, userPrefs);
 
