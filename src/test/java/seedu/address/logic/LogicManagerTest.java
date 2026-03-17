@@ -45,10 +45,17 @@ public class LogicManagerTest {
 
     @BeforeEach
     public void setUp() {
-        JsonAddressBookStorage addressBookStorage =
-                new JsonAddressBookStorage(temporaryFolder.resolve("addressBook.json"));
+        /* JsonAddressBookStorage addressBookStorage =
+                new JsonAddressBookStorage(temporaryFolder.resolve("addressBook.json")); */
+        JsonAddressBookStorage patientDataStorage =
+                new JsonAddressBookStorage(temporaryFolder.resolve("patients.json"));
+        JsonAddressBookStorage doctorDataStorage =
+                new JsonAddressBookStorage(temporaryFolder.resolve("doctors.json"));
+        JsonAddressBookStorage scheduleDataStorage =
+                new JsonAddressBookStorage(temporaryFolder.resolve("schedule.json"));
         JsonUserPrefsStorage userPrefsStorage = new JsonUserPrefsStorage(temporaryFolder.resolve("userPrefs.json"));
-        StorageManager storage = new StorageManager(addressBookStorage, userPrefsStorage);
+        StorageManager storage = new StorageManager(patientDataStorage, doctorDataStorage,
+                scheduleDataStorage, userPrefsStorage);
         logic = new LogicManager(model, storage);
     }
 
@@ -158,9 +165,34 @@ public class LogicManagerTest {
             }
         };
 
+        JsonAddressBookStorage patientDataStorage = new JsonAddressBookStorage(prefPath) {
+            @Override
+            public void saveAddressBook(ReadOnlyAddressBook addressBook, Path filePath)
+                    throws IOException {
+                throw e;
+            }
+        };
+
+        JsonAddressBookStorage doctorDataStorage = new JsonAddressBookStorage(prefPath) {
+            @Override
+            public void saveAddressBook(ReadOnlyAddressBook addressBook, Path filePath)
+                    throws IOException {
+                throw e;
+            }
+        };
+
+        JsonAddressBookStorage scheduleDataStorage = new JsonAddressBookStorage(prefPath) {
+            @Override
+            public void saveAddressBook(ReadOnlyAddressBook addressBook, Path filePath)
+                    throws IOException {
+                throw e;
+            }
+        };
+
         JsonUserPrefsStorage userPrefsStorage =
                 new JsonUserPrefsStorage(temporaryFolder.resolve("ExceptionUserPrefs.json"));
-        StorageManager storage = new StorageManager(addressBookStorage, userPrefsStorage);
+        StorageManager storage = new StorageManager(patientDataStorage, doctorDataStorage,
+                scheduleDataStorage, userPrefsStorage);
 
         logic = new LogicManager(model, storage);
 
