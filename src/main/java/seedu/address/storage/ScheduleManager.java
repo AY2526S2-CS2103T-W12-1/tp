@@ -6,6 +6,8 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import seedu.address.model.appointment.Appointment;
+
 /**
  * Manages access to the schedule data stored in the schedule JSON file.
  */
@@ -36,6 +38,31 @@ public class ScheduleManager {
         } catch (IOException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public static void addAppt(Appointment appt) {
+        String doctorName = appt.getDocName();
+        String patName = appt.getPatName();
+        String date = appt.getDate();
+        String time = appt.getTime();
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            File file = new File(FILE_PATH);
+            Map<String, Object> data = mapper.readValue(file, Map.class);
+
+            Map<String, String> slots = getScheduleIgnoreCase(doctorName, date);
+            if (slots == null) {
+                throw new IOException("Doctor or date not found!");
+            }
+            slots.put(time, patName);
+
+            mapper.writerWithDefaultPrettyPrinter().writeValue(file, data);
+
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

@@ -26,9 +26,10 @@ public class AddApptCommandParser {
         }
 
         String person = argMultimap.getPreamble(); // This gets whatever is before the first prefix
-        String dateTime = argMultimap.getValue(PREFIX_DATE).get() + " " + argMultimap.getValue(PREFIX_TIME).get();
+        String date = argMultimap.getValue(PREFIX_DATE).get();
+        String time = argMultimap.getValue(PREFIX_TIME).get();
         String doctor = argMultimap.getValue(PREFIX_DOCTOR).get();
-        Appointment appt = new Appointment(person, doctor, dateTime);
+        Appointment appt = new Appointment(person, doctor, date, time);
 
         return new AddApptCommand(appt);
     }

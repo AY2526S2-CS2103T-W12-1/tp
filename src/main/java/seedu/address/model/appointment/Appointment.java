@@ -3,12 +3,15 @@ package seedu.address.model.appointment;
 public class Appointment {
     private String patientName;
     private String doctorName;
-    private String dateTime;
+    private String date;
+    private String time;
 
-    public Appointment(String dateTime, String doctorName, String patientName) {
-        this.dateTime = dateTime;
+    public Appointment( String doctorName, String patientName, String date, String time) {
         this.doctorName = doctorName;
         this.patientName = patientName;
+        this.date = date;
+        this.time = time;
+
     }
 
     public String getPatName() {
@@ -19,17 +22,20 @@ public class Appointment {
         return this.doctorName;
     }
 
-    public String getStart() {
-        return this.dateTime;
+    public String getDate() {
+        return this.date;
     }
+
+    public String getTime() { return this.time; }
 
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         } else if (obj instanceof Appointment) {
-            return this.patientName.equals(((Appointment) obj).getPatName())
-                    && this.dateTime.equals(((Appointment) obj).getStart());
+            return (this.patientName.equals(((Appointment) obj).getPatName())
+                    && this.date.equals(((Appointment) obj).getDate())
+                    && this.time.equals(((Appointment) obj).getTime()));
         } else {
             return false;
         }
