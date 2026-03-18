@@ -6,6 +6,8 @@ import java.util.function.Predicate;
 import javafx.collections.ObservableList;
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.model.appointment.Appointment;
+import seedu.address.model.person.Doctor;
+import seedu.address.model.person.Patient;
 import seedu.address.model.person.Person;
 
 /**
@@ -41,9 +43,39 @@ public interface Model {
     Path getAddressBookFilePath();
 
     /**
+     * Returns the user prefs' patients file path.
+     */
+    Path getPatientsFilePath();
+
+    /**
+     * Returns the user prefs' doctors file path.
+     */
+    Path getDoctorsFilePath();
+
+    /**
+     * Returns the user prefs' schedule file path.
+     */
+    Path getScheduleFilePath();
+
+    /**
      * Sets the user prefs' address book file path.
      */
     void setAddressBookFilePath(Path addressBookFilePath);
+
+    /**
+     * Sets the user prefs' patients file path.
+     */
+    void setPatientsFilePath(Path patientsFilePath);
+
+    /**
+     * Sets the user prefs' doctors file path.
+     */
+    void setDoctorsFilePath(Path doctorsFilePath);
+
+    /**
+     * Sets the user prefs' schedule file path.
+     */
+    void setScheduleFilePath(Path scheduleFilePath);
 
     /**
      * Replaces address book data with the data in {@code addressBook}.
@@ -71,6 +103,18 @@ public interface Model {
     void addPerson(Person person);
 
     void addAppt(Appointment appt);
+
+    /**
+     * Adds the given doctor.
+     * {@code doctor} must not already exist in the address book.
+     */
+    void addDoctor(Doctor doctor);
+
+    /**
+     * Adds the given patient.
+     * {@code patient} must not already exist in the address book.
+     */
+    void addPatient(Patient patient);
 
     /**
      * Replaces the given person {@code target} with {@code editedPerson}.

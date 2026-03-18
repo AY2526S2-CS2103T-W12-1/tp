@@ -12,6 +12,8 @@ import javafx.collections.transformation.FilteredList;
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.commons.core.LogsCenter;
 import seedu.address.model.appointment.Appointment;
+import seedu.address.model.person.Doctor;
+import seedu.address.model.person.Patient;
 import seedu.address.model.person.Person;
 import seedu.address.storage.ScheduleManager;
 
@@ -72,9 +74,42 @@ public class ModelManager implements Model {
     }
 
     @Override
+    public Path getPatientsFilePath() {
+        return userPrefs.getPatientsFilePath();
+    }
+
+    @Override
+    public Path getDoctorsFilePath() {
+        return userPrefs.getDoctorsFilePath();
+    }
+
+    @Override
+    public Path getScheduleFilePath() {
+        return userPrefs.getScheduleFilePath();
+    }
+
+    @Override
     public void setAddressBookFilePath(Path addressBookFilePath) {
         requireNonNull(addressBookFilePath);
         userPrefs.setAddressBookFilePath(addressBookFilePath);
+    }
+
+    @Override
+    public void setPatientsFilePath(Path patientsFilePath) {
+        requireNonNull(patientsFilePath);
+        userPrefs.setPatientsFilePath(patientsFilePath);
+    }
+
+    @Override
+    public void setDoctorsFilePath(Path doctorsFilePath) {
+        requireNonNull(doctorsFilePath);
+        userPrefs.setDoctorsFilePath(doctorsFilePath);
+    }
+
+    @Override
+    public void setScheduleFilePath(Path scheduleFilePath) {
+        requireNonNull(scheduleFilePath);
+        userPrefs.setScheduleFilePath(scheduleFilePath);
     }
 
     //=========== AddressBook ================================================================================
@@ -103,6 +138,18 @@ public class ModelManager implements Model {
     @Override
     public void addPerson(Person person) {
         addressBook.addPerson(person);
+        updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
+    }
+
+    @Override
+    public void addPatient(Patient patient) {
+        addressBook.addPatient(patient);
+        updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
+    }
+
+    @Override
+    public void addDoctor(Doctor doctor) {
+        addressBook.addDoctor(doctor);
         updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
     }
 
