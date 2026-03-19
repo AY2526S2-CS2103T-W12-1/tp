@@ -265,8 +265,10 @@ _Details coming soon ..._
 
 Action     | Format, Examples
 -----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+**Add Appointment** | `addappt d/DOCTOR_NAME n/PATIENT_NAME date/YYYY-MM-DD time/HH:MM` <br> e.g., `addappt d/James Ho n/Jane Tan date/2026-03-21 time/09:00`
 **Add Doctor**    | `addoc n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS…​` <br> e.g., `adddoc n/James Ho p/22224444 e/jamesho@example.com a/123, Clementi Rd, 1234665`
 **Clear**  | `clear`
+**Delete Appointment** | `delappt d/DOCTOR_NAME n/PATIENT_NAME date/YYYY-MM-DD time/HH:MM` <br> e.g., `delappt d/James Ho n/Jane Tan date/2026-03-21 time/09:00`
 **Delete Doctor** | `deldoc INDEX`<br> e.g., `deldoc 3`
 **Find**   | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`
 **List**   | `list`
