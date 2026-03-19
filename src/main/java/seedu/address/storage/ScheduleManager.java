@@ -10,6 +10,8 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import seedu.address.model.appointment.Appointment;
+
 /**
  * Manages access to the schedule data stored in the schedule JSON file.
  */
@@ -33,6 +35,7 @@ public class ScheduleManager {
 
             Map<String, Map<String, Map<String, String>>> data =
                     mapper.readValue(file, Map.class);
+
 
             // 🔍 find doctor (case-insensitive)
             Map<String, Map<String, String>> doctorSchedule = null;
@@ -69,6 +72,11 @@ public class ScheduleManager {
             ObjectMapper mapper = new ObjectMapper();
             File file = new File(FILE_PATH);
 
+            file.getParentFile().mkdirs();
+            if (!file.exists() || file.length() == 0) {
+                mapper.writeValue(file, new HashMap<>());
+            }
+
             Map<String, Object> data = mapper.readValue(file, Map.class);
 
             if (data.containsKey(doctorName)) {
@@ -97,6 +105,91 @@ public class ScheduleManager {
             data.put(doctorName, doctorSchedule);
 
             mapper.writerWithDefaultPrettyPrinter().writeValue(file, data);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * books an appointment for the specific doctor
+     * @param appt
+     */
+    public static void addAppt(Appointment appt) {
+        String doctorName = appt.getDocName();
+        String patName = appt.getPatName();
+        String date = appt.getDate();
+        String time = appt.getTime();
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            File file = new File(FILE_PATH);
+            Map<String, Object> data = mapper.readValue(file, Map.class);
+
+            for (String name : data.keySet()) {
+                if (name.equalsIgnoreCase(doctorName)) {
+                    Map<String, Object> doctorSchedule =
+                            (Map<String, Object>) data.get(name);
+
+                    if (!doctorSchedule.containsKey(date)) {
+                        throw new IOException("Date not found!");
+                    }
+
+                    Map<String, String> slots =
+                            (Map<String, String>) doctorSchedule.get(date);
+
+
+                    slots.put(time, patName);
+                    mapper.writerWithDefaultPrettyPrinter().writeValue(file, data);
+
+
+                    break;
+                }
+            }
+
+            mapper.writerWithDefaultPrettyPrinter().writeValue(file, data);
+
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * deletes an appointment according to the time and date from a doctor's schedule
+     * @param appt
+     */
+    public static void delAppt(Appointment appt) {
+        String doctorName = appt.getDocName();
+        String date = appt.getDate();
+        String time = appt.getTime();
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            File file = new File(FILE_PATH);
+            Map<String, Object> data = mapper.readValue(file, Map.class);
+
+            for (String name : data.keySet()) {
+                if (name.equalsIgnoreCase(doctorName)) {
+
+                    Map<String, Object> doctorSchedule =
+                            (Map<String, Object>) data.get(name);
+
+                    if (!doctorSchedule.containsKey(date)) {
+                        throw new IOException("Date not found!");
+                    }
+
+                    Map<String, String> slots =
+                            (Map<String, String>) doctorSchedule.get(date);
+
+                    slots.put(time, null);
+                    mapper.writerWithDefaultPrettyPrinter().writeValue(file, data);
+                    break;
+                }
+            }
+
+            mapper.writerWithDefaultPrettyPrinter().writeValue(file, data);
+
+
 
         } catch (IOException e) {
             e.printStackTrace();
