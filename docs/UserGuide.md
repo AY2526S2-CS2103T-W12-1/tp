@@ -254,5 +254,5 @@ Action     | Format, Examples
 **Edit**   | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]…​`<br> e.g.,`edit 2 n/James Lee e/jameslee@example.com`
 **Find**   | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`
 **List**   | `list`
-**ViewSched** | `viewsched d/DOCTOR_NAME date/YYYY-MM-DD`<br> e.g., `viewsched d/John Tan date/2026-03-20`
+**View Schedule** | `viewsched d/DOCTOR_NAME date/YYYY-MM-DD`<br> e.g., `viewsched d/John Tan date/2026-03-20`
 **Help**   | `help`
