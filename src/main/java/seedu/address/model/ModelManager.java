@@ -11,9 +11,11 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.commons.core.LogsCenter;
+import seedu.address.model.appointment.Appointment;
 import seedu.address.model.person.Doctor;
 import seedu.address.model.person.Patient;
 import seedu.address.model.person.Person;
+import seedu.address.storage.ScheduleManager;
 
 /**
  * Represents the in-memory model of the address book data.
@@ -189,6 +191,17 @@ public class ModelManager implements Model {
         doctors.addDoctor(doctor);
         addressBook.addPerson(doctor);
         updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
+    }
+
+    @Override
+    public void addAppt(Appointment appt) {
+        ScheduleManager.addAppt(appt);
+
+    }
+
+    @Override
+    public void delAppt(Appointment appt) {
+        ScheduleManager.delAppt(appt);
     }
 
     @Override
