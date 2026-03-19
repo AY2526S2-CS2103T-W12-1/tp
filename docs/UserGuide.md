@@ -240,4 +240,5 @@ Action     | Format, Examples
 **Delete Doctor** | `deldoc INDEX`<br> e.g., `deldoc 3`
 **Find**   | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`
 **List**   | `list`
+**View Schedule** | `viewsched d/DOCTOR_NAME date/YYYY-MM-DD`<br> e.g., `viewsched d/John Tan date/2026-03-20`
 **Help**   | `help`
