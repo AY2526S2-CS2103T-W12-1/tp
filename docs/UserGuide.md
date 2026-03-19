@@ -205,7 +205,7 @@ Schedule for John Tan on 2026-02-22
 09:30 – Booked
 10:00 – Available
 10:30 – Available
-11:00 – Booked
+11:00 – Available
 11:30 – Available
 12:00 – Available
 12:30 – Available
