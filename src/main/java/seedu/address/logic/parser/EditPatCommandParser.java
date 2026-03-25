@@ -18,6 +18,9 @@ import seedu.address.logic.commands.EditPatCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.tag.Tag;
 
+/**
+ * Parses input arguments and creates a new EditPatCommand object
+ */
 public class EditPatCommandParser {
     /**
      * Parses the given {@code String} of arguments in the context of the EditDocCommand
