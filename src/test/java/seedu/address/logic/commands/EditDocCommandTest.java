@@ -7,29 +7,25 @@ import static seedu.address.logic.commands.CommandTestUtil.DESC_AMY;
 import static seedu.address.logic.commands.CommandTestUtil.DESC_BOB;
 import static seedu.address.logic.commands.CommandTestUtil.VALID_NAME_BOB;
 import static seedu.address.logic.commands.CommandTestUtil.VALID_PHONE_BOB;
-import static seedu.address.logic.commands.CommandTestUtil.VALID_TAG_HUSBAND;
 import static seedu.address.logic.commands.CommandTestUtil.assertCommandFailure;
 import static seedu.address.logic.commands.CommandTestUtil.assertCommandSuccess;
 import static seedu.address.logic.commands.CommandTestUtil.showPersonAtIndex;
+import static seedu.address.testutil.TypicalDoctors.getTypicalAddressBook;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
 import static seedu.address.testutil.TypicalIndexes.INDEX_SECOND_PERSON;
-import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
 
 import org.junit.jupiter.api.Test;
 
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.Messages;
-import seedu.address.logic.commands.ClearCommand;
-import seedu.address.logic.commands.EditDocCommand;
 import seedu.address.logic.commands.EditDocCommand.EditDoctorDescriptor;
 import seedu.address.model.AddressBook;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
 import seedu.address.model.person.Doctor;
-import seedu.address.model.person.Person;
-import seedu.address.testutil.EditPersonDescriptorBuilder;
-import seedu.address.testutil.PersonBuilder;
+import seedu.address.testutil.DoctorBuilder;
+import seedu.address.testutil.EditDoctorDescriptorBuilder;
 
 /**
  * Contains integration tests (interaction with the Model) and unit tests for EditDocCommand.
@@ -41,15 +37,16 @@ public class EditDocCommandTest {
 
     @Test
     public void execute_allFieldsSpecifiedUnfilteredList_success() {
-        Doctor editedDoctor = new PersonBuilder().build();
+        Doctor editedDoctor = new DoctorBuilder().build();
         EditDoctorDescriptor descriptor = new EditDoctorDescriptorBuilder(editedDoctor).build();
         EditDocCommand editDocCommand = new EditDocCommand(INDEX_FIRST_PERSON, descriptor);
 
-        String expectedMessage = String.format(EditDocCommand.MESSAGE_EDIT_DOCTOR_SUCCESS, Messages.format(editedDoctor));
+        String expectedMessage = String.format(EditDocCommand.MESSAGE_EDIT_DOCTOR_SUCCESS,
+                Messages.format(editedDoctor));
 
         Model expectedModel = new ModelManager(new AddressBook(model.getAddressBook()), model.getPatientData(),
                 model.getDoctorData(), new UserPrefs());
-        expectedModel.setDoctor(model.getFilteredPersonList().get(0), editedDoctor);
+        expectedModel.setDoctor((Doctor) model.getFilteredPersonList().get(0), editedDoctor);
 
         assertCommandSuccess(editDocCommand, model, expectedMessage, expectedModel);
     }
@@ -57,20 +54,21 @@ public class EditDocCommandTest {
     @Test
     public void execute_someFieldsSpecifiedUnfilteredList_success() {
         Index indexLastDoctor = Index.fromOneBased(model.getFilteredPersonList().size());
-        Doctor lastDoctor = model.getFilteredPersonList().get(indexLastPerson.getZeroBased());
+        Doctor lastDoctor = (Doctor) model.getFilteredPersonList().get(indexLastDoctor.getZeroBased());
 
-        PersonBuilder doctorInList = new PersonBuilder(lastDoctor);
-        Doctor editedDoctor = doctorInList.withName(VALID_NAME_BOB).withPhone(VALID_PHONE_BOB).build();
+        DoctorBuilder doctorInList = new DoctorBuilder(lastDoctor);
+        Doctor editedDoctor = (Doctor) doctorInList.withName(VALID_NAME_BOB).withPhone(VALID_PHONE_BOB).build();
 
         EditDoctorDescriptor descriptor = new EditDoctorDescriptorBuilder().withName(VALID_NAME_BOB)
                 .withPhone(VALID_PHONE_BOB).build();
         EditDocCommand editDocCommand = new EditDocCommand(indexLastDoctor, descriptor);
 
-        String expectedMessage = String.format(EditDocCommand.MESSAGE_EDIT_DOCTOR_SUCCESS, Messages.format(editedDoctor));
+        String expectedMessage = String.format(EditDocCommand.MESSAGE_EDIT_DOCTOR_SUCCESS,
+                Messages.format(editedDoctor));
 
         Model expectedModel = new ModelManager(new AddressBook(model.getAddressBook()), model.getPatientData(),
                 model.getDoctorData(), new UserPrefs());
-        expectedModel.setPerson(lastDoctor, editedDoctor);
+        expectedModel.setDoctor(lastDoctor, editedDoctor);
 
         assertCommandSuccess(editDocCommand, model, expectedMessage, expectedModel);
     }
@@ -78,9 +76,10 @@ public class EditDocCommandTest {
     @Test
     public void execute_noFieldSpecifiedUnfilteredList_success() {
         EditDocCommand editDocCommand = new EditDocCommand(INDEX_FIRST_PERSON, new EditDoctorDescriptor());
-        Doctor editedDoctor = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
+        Doctor editedDoctor = (Doctor) model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
 
-        String expectedMessage = String.format(EditDocCommand.MESSAGE_EDIT_DOCTOR_SUCCESS, Messages.format(editedDoctor));
+        String expectedMessage = String.format(EditDocCommand.MESSAGE_EDIT_DOCTOR_SUCCESS,
+                Messages.format(editedDoctor));
 
         Model expectedModel = new ModelManager(new AddressBook(model.getAddressBook()), model.getPatientData(),
                 model.getDoctorData(), new UserPrefs());
@@ -92,27 +91,28 @@ public class EditDocCommandTest {
     public void execute_filteredList_success() {
         showPersonAtIndex(model, INDEX_FIRST_PERSON);
 
-        Doctor doctorInFilteredList = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
-        Doctor editedDoctor = new PersonBuilder(doctorInFilteredList).withName(VALID_NAME_BOB).build();
+        Doctor doctorInFilteredList = (Doctor) model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
+        Doctor editedDoctor = new DoctorBuilder(doctorInFilteredList).withName(VALID_NAME_BOB).build();
         EditDocCommand editDocCommand = new EditDocCommand(INDEX_FIRST_PERSON,
-                new EditPersonDescriptorBuilder().withName(VALID_NAME_BOB).build());
+                new EditDoctorDescriptorBuilder().withName(VALID_NAME_BOB).build());
 
-        String expectedMessage = String.format(EditDocCommand.MESSAGE_EDIT_DOCTOR_SUCCESS, Messages.format(editedDoctor));
+        String expectedMessage = String.format(EditDocCommand.MESSAGE_EDIT_DOCTOR_SUCCESS,
+                Messages.format(editedDoctor));
 
         Model expectedModel = new ModelManager(new AddressBook(model.getAddressBook()), model.getPatientData(),
                 model.getDoctorData(), new UserPrefs());
-        expectedModel.setDoctor(model.getFilteredPersonList().get(0), editedDoctor);
+        expectedModel.setDoctor((Doctor) model.getFilteredPersonList().get(0), editedDoctor);
 
         assertCommandSuccess(editDocCommand, model, expectedMessage, expectedModel);
     }
 
     @Test
     public void execute_duplicatePersonUnfilteredList_failure() {
-        Doctor firstDoctor = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
+        Doctor firstDoctor = (Doctor) model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
         EditDoctorDescriptor descriptor = new EditDoctorDescriptorBuilder(firstDoctor).build();
         EditDocCommand editDocCommand = new EditDocCommand(INDEX_SECOND_PERSON, descriptor);
 
-        assertCommandFailure(editDocCommand, model, EditDocCommand.MESSAGE_DUPLICATE_PERSON);
+        assertCommandFailure(editDocCommand, model, EditDocCommand.MESSAGE_DUPLICATE_DOCTOR);
     }
 
     @Test
@@ -120,17 +120,17 @@ public class EditDocCommandTest {
         showPersonAtIndex(model, INDEX_FIRST_PERSON);
 
         // edit doctor in filtered list into a duplicate in app
-        Doctor doctorInList = model.getAddressBook().getPersonList().get(INDEX_SECOND_PERSON.getZeroBased());
+        Doctor doctorInList = (Doctor) model.getAddressBook().getPersonList().get(INDEX_SECOND_PERSON.getZeroBased());
         EditDocCommand editDocCommand = new EditDocCommand(INDEX_FIRST_PERSON,
-                new EditPersonDescriptorBuilder(doctorInList).build());
+                new EditDoctorDescriptorBuilder(doctorInList).build());
 
-        assertCommandFailure(editDocCommand, model, EditDocCommand.MESSAGE_DUPLICATE_PERSON);
+        assertCommandFailure(editDocCommand, model, EditDocCommand.MESSAGE_DUPLICATE_DOCTOR);
     }
 
     @Test
     public void execute_invalidPersonIndexUnfilteredList_failure() {
         Index outOfBoundIndex = Index.fromOneBased(model.getFilteredPersonList().size() + 1);
-        EditDoctorDescriptor descriptor = new EditPersonDescriptorBuilder().withName(VALID_NAME_BOB).build();
+        EditDoctorDescriptor descriptor = new EditDoctorDescriptorBuilder().withName(VALID_NAME_BOB).build();
         EditDocCommand editDocCommand = new EditDocCommand(outOfBoundIndex, descriptor);
 
         assertCommandFailure(editDocCommand, model, Messages.MESSAGE_INVALID_DOCTOR_DISPLAYED_INDEX);
@@ -148,7 +148,7 @@ public class EditDocCommandTest {
         assertTrue(outOfBoundIndex.getZeroBased() < model.getAddressBook().getPersonList().size());
 
         EditDocCommand editDocCommand = new EditDocCommand(outOfBoundIndex,
-                new EditPersonDescriptorBuilder().withName(VALID_NAME_BOB).build());
+                new EditDoctorDescriptorBuilder().withName(VALID_NAME_BOB).build());
 
         assertCommandFailure(editDocCommand, model, Messages.MESSAGE_INVALID_DOCTOR_DISPLAYED_INDEX);
     }
