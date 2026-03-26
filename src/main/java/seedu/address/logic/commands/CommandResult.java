@@ -2,6 +2,7 @@ package seedu.address.logic.commands;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Map;
 import java.util.Objects;
 
 import seedu.address.commons.util.ToStringBuilder;
@@ -11,6 +12,8 @@ import seedu.address.commons.util.ToStringBuilder;
  */
 public class CommandResult {
 
+    public final Map<String, String> schedule;
+
     private final String feedbackToUser;
 
     /** Help information should be shown to the user. */
@@ -19,13 +22,15 @@ public class CommandResult {
     /** The application should exit. */
     private final boolean exit;
 
+
     /**
      * Constructs a {@code CommandResult} with the specified fields.
      */
-    public CommandResult(String feedbackToUser, boolean showHelp, boolean exit) {
+    public CommandResult(String feedbackToUser, boolean showHelp, boolean exit, Map<String, String> schedule) {
         this.feedbackToUser = requireNonNull(feedbackToUser);
         this.showHelp = showHelp;
         this.exit = exit;
+        this.schedule = schedule;
     }
 
     /**
@@ -33,9 +38,25 @@ public class CommandResult {
      * and other fields set to their default value.
      */
     public CommandResult(String feedbackToUser) {
-        this(feedbackToUser, false, false);
+        this(feedbackToUser, false, false, null);
     }
 
+    /**
+     * Constructs a {@code CommandResult} with the specified {@code feedbackToUser} and {@code schedule},
+     * and other fields set to their default value.
+     * @param feedbackToUser
+     * @param schedule
+     */
+    public CommandResult(String feedbackToUser, Map<String, String> schedule) {
+        this(feedbackToUser, false, false, schedule);
+    }
+
+    /**
+     * For help/exit commands
+     */
+    public CommandResult(String feedbackToUser, boolean showHelp, boolean exit) {
+        this(feedbackToUser, showHelp, exit, null);
+    }
     public String getFeedbackToUser() {
         return feedbackToUser;
     }

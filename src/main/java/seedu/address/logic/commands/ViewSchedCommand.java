@@ -45,18 +45,23 @@ public class ViewSchedCommand extends Command {
                 return new CommandResult(MESSAGE_DOCTOR_NOT_FOUND);
             }
 
-            StringBuilder result = new StringBuilder();
-            result.append(String.format(MESSAGE_SUCCESS, doctorName, date));
+            // StringBuilder result = new StringBuilder();
+            // result.append(String.format(MESSAGE_SUCCESS, doctorName, date));
 
-            for (Map.Entry<String, String> slot : schedule.entrySet()) {
-                if (slot.getValue() == null) {
-                    result.append(slot.getKey()).append(" – Available\n");
-                } else {
-                    result.append(slot.getKey()).append(" – Booked\n");;
-                }
-            }
+            // for (Map.Entry<String, String> slot : schedule.entrySet()) {
+            //     if (slot.getValue() == null) {
+            //         result.append(slot.getKey()).append(" – Available\n");
+            //     } else {
+            //         result.append(slot.getKey()).append(" – Booked\n");;
+            //     }
+            // }
 
-            return new CommandResult(result.toString());
+            // return new CommandResult(result.toString(), schedule);
+
+            return new CommandResult(
+                        String.format(MESSAGE_SUCCESS, doctorName, date),
+                        schedule
+                );
 
         } catch (IllegalArgumentException e) {
             return new CommandResult(MESSAGE_DATE_NOT_AVAILABLE);
