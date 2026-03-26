@@ -120,6 +120,7 @@
         "deleting-a-doctor-deldoc": "Deleting a doctor : deldoc",
         "deleting-a-patient-delpat": "Deleting a patient : delpat",
         "viewing-a-doctor-s-schedule-viewsched": "Viewing a doctor's schedule : viewsched",
+        "editing-a-patient-s-details-editpat": "Editing a patient's details : editpat",
         "clearing-all-entries-clear": "Clearing all entries : clear",
         "exiting-the-program-exit": "Exiting the program : exit",
         "saving-the-data": "Saving the data",
