@@ -198,6 +198,28 @@ public class MainWindow extends UiPart<Stage> {
         }
     }
 
+    private void showWeeklySchedulePopup(Map<String, Map<String, String>> weeklySchedule) {
+        try {
+            SchedulePanel panel = new SchedulePanel();
+            panel.displayWeeklySchedule(weeklySchedule);
+
+            Stage stage = new Stage();
+            stage.setTitle("Weekly Doctor Schedule");
+
+            Scene scene = new Scene(panel.getRoot());
+            scene.getStylesheets().add(getClass().getResource("/view/DarkTheme.css").toExternalForm());
+
+            stage.setScene(scene);
+            stage.setWidth(800); // wider for weekly view
+            stage.setHeight(400);
+
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Executes the command and returns the result.
      *
@@ -209,8 +231,10 @@ public class MainWindow extends UiPart<Stage> {
             logger.info("Result: " + commandResult.getFeedbackToUser());
             resultDisplay.setFeedbackToUser(commandResult.getFeedbackToUser());
 
-            if (commandResult.schedule != null) {
-                showSchedulePopup(commandResult.schedule);
+            if (commandResult.isWeekly() && commandResult.getWeeklySchedule() != null) {
+                showWeeklySchedulePopup(commandResult.getWeeklySchedule());
+            } else if (commandResult.getSchedule() != null) {
+                showSchedulePopup(commandResult.getSchedule());
             }
 
             if (commandResult.isShowHelp()) {
