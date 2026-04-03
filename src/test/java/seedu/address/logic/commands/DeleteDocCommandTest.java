@@ -49,7 +49,7 @@ public class DeleteDocCommandTest {
         Index outOfBoundIndex = Index.fromOneBased(model.getFilteredPersonList().size() + 1);
         DeleteDocCommand deleteDocCommand = new DeleteDocCommand(outOfBoundIndex);
 
-        assertCommandFailure(deleteDocCommand, model, Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
+        assertCommandFailure(deleteDocCommand, model, Messages.MESSAGE_INVALID_DOCTOR_DISPLAYED_INDEX);
     }
 
     /*
@@ -82,7 +82,7 @@ public class DeleteDocCommandTest {
 
         DeleteDocCommand deleteDocCommand = new DeleteDocCommand(outOfBoundIndex);
 
-        assertCommandFailure(deleteDocCommand, model, Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
+        assertCommandFailure(deleteDocCommand, model, Messages.MESSAGE_INVALID_DOCTOR_DISPLAYED_INDEX);
     }
 
     @Test
