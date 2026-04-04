@@ -47,7 +47,11 @@ public class DeleteDocCommand extends Command {
             throw new CommandException("The person at the specified index is not a doctor.");
         }
         model.deleteDoctor((Doctor) personToDelete);
-        ScheduleManager.removeDoctorSchedule(personToDelete.getName().fullName);
+        try {
+            ScheduleManager.removeDoctorSchedule(personToDelete.getName().fullName);
+        } catch (java.io.IOException e) {
+            throw new CommandException("Failed to update schedule file.");
+        }
         return new CommandResult(String.format(MESSAGE_DELETE_DOCTOR_SUCCESS, Messages.format(personToDelete)));
     }
 

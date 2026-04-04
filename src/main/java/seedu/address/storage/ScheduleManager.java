@@ -81,19 +81,15 @@ public class ScheduleManager {
      *
      * @param doctorName the name of the doctor whose schedule needs to be removed.
      */
-    public static void removeDoctorSchedule(String doctorName) {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            File file = new File(FILE_PATH);
-            Map<String, Object> data = readScheduleFile();
+    public static void removeDoctorSchedule(String doctorName) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        File file = new File(FILE_PATH);
+        Map<String, Object> data = readScheduleFile();
 
-            String matchedDoctor = findDoctorKey(data, doctorName);
-            if (matchedDoctor != null) {
-                data.remove(matchedDoctor);
-                mapper.writerWithDefaultPrettyPrinter().writeValue(file, data);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        String matchedDoctor = findDoctorKey(data, doctorName);
+        if (matchedDoctor != null) {
+            data.remove(matchedDoctor);
+            mapper.writerWithDefaultPrettyPrinter().writeValue(file, data);
         }
     }
 
@@ -103,20 +99,16 @@ public class ScheduleManager {
      * @param currDoctorName the current name of the doctor as shown in the schedule.
      * @param newDoctorName the new name of doctor being renamed.
      */
-    public static void renameDoctorSchedule(String currDoctorName, String newDoctorName) {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            File file = new File(FILE_PATH);
-            Map<String, Object> data = readScheduleFile();
+    public static void renameDoctorSchedule(String currDoctorName, String newDoctorName) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        File file = new File(FILE_PATH);
+        Map<String, Object> data = readScheduleFile();
 
-            String matchedDoctor = findDoctorKey(data, currDoctorName);
-            if (matchedDoctor != null) {
-                Object scheduleData = data.remove(matchedDoctor);
-                data.put(newDoctorName, scheduleData);
-                mapper.writerWithDefaultPrettyPrinter().writeValue(file, data);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        String matchedDoctor = findDoctorKey(data, currDoctorName);
+        if (matchedDoctor != null) {
+            Object scheduleData = data.remove(matchedDoctor);
+            data.put(newDoctorName, scheduleData);
+            mapper.writerWithDefaultPrettyPrinter().writeValue(file, data);
         }
     }
 

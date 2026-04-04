@@ -90,7 +90,11 @@ public class EditDocCommand extends Command {
         model.setDoctor(doctorToEdit, editedDoctor);
 
         if (!currDoctorName.equalsIgnoreCase(newDoctorName)) {
-            ScheduleManager.renameDoctorSchedule(currDoctorName, newDoctorName);
+            try {
+                ScheduleManager.renameDoctorSchedule(currDoctorName, newDoctorName);
+            } catch (java.io.IOException e) {
+                throw new CommandException("Failed to update schedule file.");
+            }
         }
 
         model.updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
@@ -102,7 +106,7 @@ public class EditDocCommand extends Command {
      * edited with {@code editDoctorDescriptor}.
      */
     private static Doctor createEditedDoctor(Person doctorToEdit, EditDoctorDescriptor editDoctorDescriptor) {
-        assert doctorToEdit != null;
+        requireNonNull(doctorToEdit);
 
         Name updatedName = editDoctorDescriptor.getName().orElse(doctorToEdit.getName());
         Phone updatedPhone = editDoctorDescriptor.getPhone().orElse(doctorToEdit.getPhone());
