@@ -1,9 +1,11 @@
 package seedu.address.ui;
 
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyCombination;
@@ -24,11 +26,16 @@ import seedu.address.logic.parser.exceptions.ParseException;
 public class MainWindow extends UiPart<Stage> {
 
     private static final String FXML = "MainWindow.fxml";
+    private static final double SINGLE_SCHEDULE_MIN_WIDTH = 760;
+    private static final double SINGLE_SCHEDULE_MIN_HEIGHT = 760;
+    private static final double WEEKLY_SCHEDULE_MIN_WIDTH = 1320;
+    private static final double WEEKLY_SCHEDULE_MIN_HEIGHT = 820;
 
     private final Logger logger = LogsCenter.getLogger(getClass());
 
     private Stage primaryStage;
     private Logic logic;
+    private Stage schedulePopupStage;
 
     // Independent Ui parts residing in this Ui container
     private PersonListPanel personListPanel;
@@ -159,6 +166,7 @@ public class MainWindow extends UiPart<Stage> {
         GuiSettings guiSettings = new GuiSettings(primaryStage.getWidth(), primaryStage.getHeight(),
                 (int) primaryStage.getX(), (int) primaryStage.getY());
         logic.setGuiSettings(guiSettings);
+        closeSchedulePopup();
         helpWindow.hide();
         primaryStage.hide();
     }
@@ -168,15 +176,94 @@ public class MainWindow extends UiPart<Stage> {
     }
 
     /**
+     * Shows the schedule in a popup window.
+     */
+    private void showSchedulePopup(Map<String, String> schedule, String doctorName, int doctorId,
+                                   java.time.LocalDate date) {
+        try {
+            closeSchedulePopup();
+            SchedulePanel panel = new SchedulePanel();
+            panel.displaySchedule(schedule, doctorName, doctorId, date);
+
+            Stage stage = new Stage();
+            schedulePopupStage = stage;
+            stage.setTitle("Doctor Schedule for " + doctorName + " on " + date.toString());
+            stage.setOnHidden(e -> schedulePopupStage = null);
+
+            panel.getRoot().setMinWidth(SINGLE_SCHEDULE_MIN_WIDTH);
+            panel.getRoot().setMinHeight(SINGLE_SCHEDULE_MIN_HEIGHT);
+
+            Scene scene = new Scene(panel.getRoot());
+
+            scene.getStylesheets().add(
+                getClass().getResource("/view/DarkTheme.css").toExternalForm()
+            );
+
+            stage.setScene(scene);
+
+            stage.setWidth(SINGLE_SCHEDULE_MIN_WIDTH);
+            stage.setHeight(SINGLE_SCHEDULE_MIN_HEIGHT);
+            stage.setMinWidth(SINGLE_SCHEDULE_MIN_WIDTH);
+            stage.setMinHeight(SINGLE_SCHEDULE_MIN_HEIGHT);
+
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void showWeeklySchedulePopup(Map<String, Map<String, String>> weeklySchedule, String doctorName,
+                                         int doctorId) {
+        try {
+            closeSchedulePopup();
+            SchedulePanel panel = new SchedulePanel();
+            panel.displayWeeklySchedule(weeklySchedule, doctorName, doctorId);
+
+            Stage stage = new Stage();
+            schedulePopupStage = stage;
+            stage.setTitle("Weekly Doctor Schedule for " + doctorName);
+            stage.setOnHidden(e -> schedulePopupStage = null);
+
+            panel.getRoot().setMinWidth(WEEKLY_SCHEDULE_MIN_WIDTH);
+            panel.getRoot().setMinHeight(WEEKLY_SCHEDULE_MIN_HEIGHT);
+
+            Scene scene = new Scene(panel.getRoot());
+            scene.getStylesheets().add(getClass().getResource("/view/DarkTheme.css").toExternalForm());
+
+            stage.setScene(scene);
+            stage.setWidth(WEEKLY_SCHEDULE_MIN_WIDTH); // wider for weekly view
+            stage.setHeight(WEEKLY_SCHEDULE_MIN_HEIGHT);
+            stage.setMinWidth(WEEKLY_SCHEDULE_MIN_WIDTH);
+            stage.setMinHeight(WEEKLY_SCHEDULE_MIN_HEIGHT);
+
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Executes the command and returns the result.
      *
      * @see seedu.address.logic.Logic#execute(String)
      */
     private CommandResult executeCommand(String commandText) throws CommandException, ParseException {
         try {
+            closeSchedulePopup();
             CommandResult commandResult = logic.execute(commandText);
             logger.info("Result: " + commandResult.getFeedbackToUser());
             resultDisplay.setFeedbackToUser(commandResult.getFeedbackToUser());
+
+            if (commandResult.isWeekly() && commandResult.getWeeklySchedule() != null) {
+                showWeeklySchedulePopup(commandResult.getWeeklySchedule(),
+                        commandResult.getScheduleDoctorName(), commandResult.getScheduleDoctorId());
+            } else if (commandResult.getSchedule() != null) {
+                showSchedulePopup(commandResult.getSchedule(),
+                        commandResult.getScheduleDoctorName(), commandResult.getScheduleDoctorId(),
+                        commandResult.getScheduleDate());
+            }
 
             if (commandResult.isShowHelp()) {
                 handleHelp();
@@ -191,6 +278,13 @@ public class MainWindow extends UiPart<Stage> {
             logger.info("An error occurred while executing command: " + commandText);
             resultDisplay.setFeedbackToUser(e.getMessage());
             throw e;
+        }
+    }
+
+    private void closeSchedulePopup() {
+        if (schedulePopupStage != null) {
+            schedulePopupStage.hide();
+            schedulePopupStage = null;
         }
     }
 }

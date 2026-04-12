@@ -11,9 +11,11 @@ import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.person.Doctor;
 import seedu.address.model.person.Person;
+import seedu.address.storage.AppointmentManager;
+import seedu.address.storage.ScheduleManager;
 
 /**
- * Deletes a person identified using it's displayed index from the address book.
+ * Deletes a doctor identified using its displayed index from the app.
  */
 public class DeleteDocCommand extends Command {
 
@@ -24,10 +26,13 @@ public class DeleteDocCommand extends Command {
             + "Parameters: INDEX (must be a positive integer)\n"
             + "Example: " + COMMAND_WORD + " 1";
 
-    public static final String MESSAGE_DELETE_DOCTOR_SUCCESS = "Deleted Doctor: %1$s";
+    public static final String MESSAGE_DELETE_DOCTOR_SUCCESS = "Deleted Doctor: %1$s\n & any linked appointments";
 
     private final Index targetIndex;
 
+    /**
+     * Creates a DeleteDocCommand to delete the doctor at the specified {@code targetIndex}.
+     */
     public DeleteDocCommand(Index targetIndex) {
         this.targetIndex = targetIndex;
     }
@@ -38,14 +43,20 @@ public class DeleteDocCommand extends Command {
         List<? extends Person> lastShownList = model.getFilteredPersonList();
 
         if (targetIndex.getZeroBased() >= lastShownList.size()) {
-            throw new CommandException(Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
+            throw new CommandException(Messages.MESSAGE_INVALID_DOCTOR_DISPLAYED_INDEX);
         }
 
         Person personToDelete = lastShownList.get(targetIndex.getZeroBased());
         if (!(personToDelete instanceof Doctor)) {
-            throw new CommandException("The person at the specified index is not a doctor.");
+            throw new CommandException(Messages.MESSAGE_NOT_A_DOCTOR);
         }
         model.deleteDoctor((Doctor) personToDelete);
+        try {
+            AppointmentManager.deleteAppointmentsByDoctorId(((Doctor) personToDelete).getDocId());
+            ScheduleManager.removeDoctorSchedule((Doctor) personToDelete);
+        } catch (java.io.IOException e) {
+            throw new CommandException(Messages.MESSAGE_SCHEDULE_UPDATE_FAILED);
+        }
         return new CommandResult(String.format(MESSAGE_DELETE_DOCTOR_SUCCESS, Messages.format(personToDelete)));
     }
 

@@ -1,12 +1,12 @@
 package seedu.address.ui;
 
-import java.util.Comparator;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
+import seedu.address.model.person.Doctor;
+import seedu.address.model.person.Patient;
 import seedu.address.model.person.Person;
 
 /**
@@ -33,13 +33,17 @@ public class PersonCard extends UiPart<Region> {
     @FXML
     private Label id;
     @FXML
+    private FlowPane tags;
+    @FXML
     private Label phone;
     @FXML
     private Label address;
     @FXML
     private Label email;
     @FXML
-    private FlowPane tags;
+    private Label doctorId;
+    @FXML
+    private Label patientId;
 
     /**
      * Creates a {@code PersonCode} with the given {@code Person} and index to display.
@@ -49,11 +53,32 @@ public class PersonCard extends UiPart<Region> {
         this.person = person;
         id.setText(displayedIndex + ". ");
         name.setText(person.getName().fullName);
-        phone.setText(person.getPhone().value);
-        address.setText(person.getAddress().value);
-        email.setText(person.getEmail().value);
-        person.getTags().stream()
-                .sorted(Comparator.comparing(tag -> tag.tagName))
-                .forEach(tag -> tags.getChildren().add(new Label(tag.tagName)));
+
+        phone.setText("Phone: " + person.getPhone().value);
+        address.setText("Address: " + person.getAddress().value);
+        email.setText("Email: " + person.getEmail().value);
+
+        Label roleTag = new Label(person.getRoleTag());
+        if (person instanceof Doctor) {
+            roleTag.getStyleClass().add("doctor-tag");
+        } else if (person instanceof seedu.address.model.person.Patient) {
+            roleTag.getStyleClass().add("patient-tag");
+        }
+        tags.getChildren().add(roleTag);
+        // doctor id information added by copilot
+        if (person instanceof Doctor) {
+            doctorId.setText("Doctor ID: " + ((Doctor) person).getDocId());
+            patientId.setVisible(false);
+            patientId.setManaged(false);
+        } else if (person instanceof Patient) {
+            patientId.setText("Patient ID: " + ((Patient) person).getPatientId());
+            doctorId.setVisible(false);
+            doctorId.setManaged(false);
+        } else {
+            doctorId.setVisible(false);
+            doctorId.setManaged(false);
+            patientId.setVisible(false);
+            patientId.setManaged(false);
+        }
     }
 }

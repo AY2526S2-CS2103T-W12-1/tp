@@ -98,6 +98,21 @@ public interface Model {
     boolean hasPerson(Person person);
 
     /**
+     * Returns true if a doctor with the same identity as {@code doctor} exists in the doctors list.
+     */
+    boolean hasDoctor(Doctor doctor);
+
+    /**
+     * Returns true if a {@code doctor} with the same ID != {@code excludeId} exists in the doctors list.
+     */
+    boolean hasDoctorExcluding(Doctor doctor, int excludeId);
+
+    /**
+     * Returns true if a patient with the same identity as {@code patient} exists in the patients list.
+     */
+    boolean hasPatient(Patient patient);
+
+    /**
      * Deletes the given patient.
      * The patient must exist in the address book.
      */
@@ -116,29 +131,30 @@ public interface Model {
     void addPerson(Person person);
 
     /**
-     * Adds the given appointment
-     * @param appt
+     * Adds the given appointment.
+     *
+     * @param appt the appointment to add.
      */
     void addAppt(Appointment appt) throws IOException;
 
     /**
-     * deletes the given appointment
-     * @param appt
+     * Deletes the given appointment.
+     *
+     * @param appt the appointment to delete.
      */
     void delAppt(Appointment appt) throws IOException;
 
     /**
-     * edits the given appointment to alter the info
-     * @param oldDoc
-     * @param oldDate
-     * @param oldTime
-     * @param newPat
-     * @param newDoc
-     * @param newDate
-     * @param newTime
+     * Edits the given appointment with the new details provided.
+     *
+     * @param oldAppt The appointment to edit.
+     * @param newDoc The new doctor id as a String, or null to keep the existing one.
+     * @param newDate The new date, or null to keep the existing one.
+     * @param newTime The new time, or null to keep the existing one.
+     * @return The edited appointment.
+     * @throws IOException If the appointment cannot be edited.
      */
-    void editAppt(String oldDoc, String oldDate,
-                  String oldTime, String newPat, String newDoc, String newDate, String newTime) throws IOException;
+    Appointment editAppt(Appointment oldAppt, String newDoc, String newDate, String newTime) throws IOException;
 
     /**
      * Adds the given doctor.

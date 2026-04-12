@@ -2,16 +2,17 @@ package seedu.address.logic.commands;
 
 import static java.util.Objects.requireNonNull;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_DATE;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_DOCTOR;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_NAME;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_DOCTOR_ID;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_PATIENT_ID;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TIME;
 
 import java.io.IOException;
-import java.time.LocalDate;
 
+import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.appointment.Appointment;
+import seedu.address.storage.AppointmentManager;
 /**
  * Adds an Appointment to the app.
  */
@@ -20,17 +21,17 @@ public class AddApptCommand extends Command {
     public static final String MESSAGE_USAGE = COMMAND_WORD
             + ": Adds an Appointment for a person at the specified date and time.\n"
             + "Parameters: "
-            + PREFIX_DOCTOR + " DOCTOR NAME "
-            + PREFIX_NAME + " NAME "
-            + PREFIX_DATE + " DATE (yyyy-mm-dd) "
+            + PREFIX_DOCTOR_ID + " DOCTOR_ID "
+            + PREFIX_PATIENT_ID + " PATIENT_ID "
+            + PREFIX_DATE + " DATE (yyyy-mm-dd)"
             + PREFIX_TIME + " TIME (H:MM)\n"
             + "Example: " + COMMAND_WORD + " "
-            + PREFIX_DOCTOR + "Sally Tan "
-            + PREFIX_NAME + " John Doe "
+            + PREFIX_DOCTOR_ID + "1 "
+            + PREFIX_PATIENT_ID + " 3 "
             + PREFIX_DATE + " 2026-03-11 "
             + PREFIX_TIME + " 9:00 ";
 
-    public static final String MESSAGE_SUCCESS = "New appointment added!";
+    public static final String MESSAGE_SUCCESS = "New appointment added! ID: %1$d";
     public static final String MESSAGE_DUPLICATE_APPT = "This appointment already exists in the address book";
 
 
@@ -48,21 +49,48 @@ public class AddApptCommand extends Command {
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
 
-        LocalDate apptDate = LocalDate.parse(toAdd.getDate());
-        LocalDate today = LocalDate.now();
-        LocalDate sevenDaysLater = today.plusDays(7);
-
-        if (apptDate.isBefore(today) || apptDate.isAfter(sevenDaysLater)) {
-            throw new CommandException(
-                    "Appointment date must be within 7 days from today!");
-        }
-
         try {
             model.addAppt(toAdd);
-            return new CommandResult(MESSAGE_SUCCESS);
+            AppointmentManager.addAppointment(toAdd);
         } catch (IOException e) {
+            // Rollback if one of the two persistence steps fails.
+            try {
+                if (toAdd.getApptID() != Appointment.UNASSIGNED_ID) {
+                    AppointmentManager.deleteAppointment(toAdd.getApptID());
+                }
+            } catch (IOException ignored) {
+                // Unable to rollback from AppointmentManager; continue with model rollback.
+            }
+
+            try {
+                model.delAppt(toAdd);
+            } catch (IOException ignored) {
+                // Unable to rollback from model; exception will be thrown below.
+            }
             throw new CommandException(e.getMessage());
         }
 
+        return new CommandResult(String.format(MESSAGE_SUCCESS, toAdd.getApptID()));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+
+        if (!(o instanceof AddApptCommand)) {
+            return false;
+        }
+
+        AddApptCommand otherCommand = (AddApptCommand) o;
+        return toAdd.equals(otherCommand.toAdd);
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .add("toAdd", toAdd)
+                .toString();
     }
 }

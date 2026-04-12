@@ -1,15 +1,11 @@
 package seedu.address.testutil;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Patient;
 import seedu.address.model.person.Phone;
-import seedu.address.model.tag.Tag;
-import seedu.address.model.util.SampleDataUtil;
+
 
 /**
  * A utility class to help with building Patient objects.
@@ -25,7 +21,7 @@ public class PatientBuilder {
     private Phone phone;
     private Email email;
     private Address address;
-    private Set<Tag> tags;
+    private Integer patientId;
 
     /**
      * Creates a {@code PersonBuilder} with the default details.
@@ -35,7 +31,7 @@ public class PatientBuilder {
         phone = new Phone(DEFAULT_PHONE);
         email = new Email(DEFAULT_EMAIL);
         address = new Address(DEFAULT_ADDRESS);
-        tags = new HashSet<>();
+        patientId = null;
     }
 
     /**
@@ -46,7 +42,7 @@ public class PatientBuilder {
         phone = patientToCopy.getPhone();
         email = patientToCopy.getEmail();
         address = patientToCopy.getAddress();
-        tags = new HashSet<>(patientToCopy.getTags());
+        patientId = patientToCopy.getPatientId();
     }
 
     /**
@@ -54,14 +50,6 @@ public class PatientBuilder {
      */
     public PatientBuilder withName(String name) {
         this.name = new Name(name);
-        return this;
-    }
-
-    /**
-     * Parses the {@code tags} into a {@code Set<Tag>} and set it to the {@code Person} that we are building.
-     */
-    public PatientBuilder withTags(String ... tags) {
-        this.tags = SampleDataUtil.getTagSet(tags);
         return this;
     }
 
@@ -89,8 +77,22 @@ public class PatientBuilder {
         return this;
     }
 
+    /**
+     * Sets the {@code patientId} of the {@code Patient} that we are building.
+     */
+    public PatientBuilder withPatId(int patientId) {
+        this.patientId = patientId;
+        return this;
+    }
+
+    /**
+     * Creates and returns the {@code Patient} based on id availability.
+     */
     public Patient build() {
-        return new Patient(name, phone, email, address, tags);
+        if (patientId != null) {
+            return new Patient(name, phone, email, address, patientId);
+        }
+        return new Patient(name, phone, email, address);
     }
 
 }
