@@ -214,6 +214,26 @@ public class AppointmentManager {
 
     }
 
+    /**
+     * Returns all persisted appointments for the given patient ID.
+     */
+    public static List<Appointment> getAppointmentsByPatientId(int patientId) throws IOException {
+        Map<String, AppointmentData> data = readAppointments();
+        return data.entrySet().stream()
+                .filter(entry -> entry.getValue() != null
+                        && entry.getValue().patientId != null
+                        && entry.getValue().patientId == patientId)
+                .map(entry -> new Appointment(
+                        entry.getValue().doctorId != null ? entry.getValue().doctorId : Appointment.UNASSIGNED_ID,
+                        entry.getValue().doctorName,
+                        entry.getValue().patientId,
+                        entry.getValue().patientName,
+                        entry.getValue().date,
+                        entry.getValue().time,
+                        Integer.parseInt(entry.getKey())))
+                .toList();
+    }
+
     private static Map<String, AppointmentData> readAppointments() throws IOException {
         File file = new File(FILE_PATH);
         if (!file.exists() || file.length() == 0) {

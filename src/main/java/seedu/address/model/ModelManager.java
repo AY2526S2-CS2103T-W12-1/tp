@@ -210,8 +210,12 @@ public class ModelManager implements Model {
      * Helper function to find a patient and remove all their appointments from the schedule.
      */
     private void deletePatientByAppt(Patient patient) {
-        for (Appointment appt : patient.getApptList()) {
-            ScheduleManager.removeApptIfExists(appt);
+        try {
+            for (Appointment appt : AppointmentManager.getAppointmentsByPatientId(patient.getPatientId())) {
+                ScheduleManager.removeApptIfExists(appt);
+            }
+        } catch (IOException e) {
+            logger.warning("Failed to remove patient appointments from schedule: " + e.getMessage());
         }
         AppointmentManager.deleteAppointmentsByPatientId(patient.getPatientId());
     }
@@ -580,7 +584,7 @@ public class ModelManager implements Model {
         String newName = newPatient.getName().fullName;
 
         if (!oldName.equals(newName)) {
-            ScheduleManager.updatePatientNameInSchedule(oldPatient, newPatient);
+            ScheduleManager.syncPatientSchedule(newPatient);
         }
     }
 

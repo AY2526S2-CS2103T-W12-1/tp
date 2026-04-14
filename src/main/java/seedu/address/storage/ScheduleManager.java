@@ -700,12 +700,17 @@ public class ScheduleManager {
      * @throws IOException if the schedule file cannot be read or written
      */
     public static void updatePatientNameInSchedule(Patient oldPatient, Patient newPatient) throws IOException {
+        syncPatientSchedule(newPatient);
+    }
+
+    /**
+     * Updates all schedule entries for the given patient using persisted appointment data.
+     */
+    public static void syncPatientSchedule(Patient patient) throws IOException {
         Map<String, Object> data = readScheduleFile();
         boolean updated = false;
-        String oldName = oldPatient.getName().fullName;
-        String newName = newPatient.getName().fullName;
 
-        for (Appointment appointment : oldPatient.getApptList()) {
+        for (Appointment appointment : AppointmentManager.getAppointmentsByPatientId(patient.getPatientId())) {
             String doctorKey = appointment.getDocId() != Appointment.UNASSIGNED_ID
                     ? findDoctorKeyByDocId(data, appointment.getDocId())
                     : findDoctorKey(data, appointment.getDocName());
@@ -721,10 +726,8 @@ public class ScheduleManager {
 
             Map<String, String> slotsMap = getDateSlots(doctorSchedule, appointment.getDate());
             String standardizedTime = getStandardizedTime(appointment.getTime());
-            String currentOccupant = slotsMap.get(standardizedTime);
-
-            if (currentOccupant != null && currentOccupant.equalsIgnoreCase(oldName)) {
-                slotsMap.put(standardizedTime, newName);
+            if (slotsMap.containsKey(standardizedTime)) {
+                slotsMap.put(standardizedTime, patient.getName().fullName);
                 updated = true;
             }
         }

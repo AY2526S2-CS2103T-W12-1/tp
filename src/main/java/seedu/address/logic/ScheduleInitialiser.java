@@ -4,6 +4,7 @@ import java.util.List;
 
 import seedu.address.model.Model;
 import seedu.address.model.person.Doctor;
+import seedu.address.model.person.Patient;
 import seedu.address.storage.ScheduleManager;
 
 /**
@@ -21,5 +22,17 @@ public class ScheduleInitialiser {
                 .toList();
 
         ScheduleManager.syncSchedules(doctors);
+
+        List<Patient> patients = model.getPatientData().getPersonList().stream()
+                .filter(p -> p instanceof Patient)
+                .map(p -> (Patient) p)
+                .toList();
+        patients.forEach(patient -> {
+            try {
+                ScheduleManager.syncPatientSchedule(patient);
+            } catch (Exception e) {
+                // Ignore startup repair failures so the app still launches.
+            }
+        });
     }
 }
