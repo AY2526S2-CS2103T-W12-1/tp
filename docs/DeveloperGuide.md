@@ -368,7 +368,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 **Extensions**
 
 * 2a. The name contains invalid characters.
-  * 2a1. System shows: `Names should only contain letters, and may include single spaces, apostrophes, or hyphens between words. Name should not be blank`
+  * 2a1. System shows: `Names should only contain letters, and may include single spaces, apostrophes, forward slash, or hyphens between words. Name should not be blank`
 
     Use case resumes at step 1.
 
@@ -438,7 +438,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
       Use case resumes at step 2.
 
 * 4a. The name contains invalid characters.
-    * 4a1. System shows: `Names should only contain letters, and may include single spaces, apostrophes, or hyphens between words. Name should not be blank`
+    * 4a1. System shows: `Names should only contain letters, and may include single spaces, apostrophes, forward slash or hyphens between words. Name should not be blank`
 
       Use case resumes at step 3.
 
@@ -512,7 +512,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 **Extensions**
 
 * 2a. The name contains invalid characters.
-  * 2a1. System shows: `Names should only contain letters, and may include single spaces, apostrophes, or hyphens between words. Name should not be blank`
+  * 2a1. System shows: `Names should only contain letters, and may include single spaces, apostrophes, forward slash or hyphens between words. Name should not be blank`
 
     Use case resumes at step 1.
 
@@ -582,7 +582,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
       Use case resumes at step 2.
 
 * 4a. The name contains invalid characters.
-    * 4a1. System shows: `Names should only contain letters, and may include single spaces, apostrophes, or hyphens between words. Name should not be blank`
+    * 4a1. System shows: `Names should only contain letters, and may include single spaces, apostrophes, forward slash or hyphens between words. Name should not be blank`
 
       Use case resumes at step 3.
 
