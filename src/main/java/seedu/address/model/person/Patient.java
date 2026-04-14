@@ -1,6 +1,7 @@
 package seedu.address.model.person;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import seedu.address.model.appointment.Appointment;
 
@@ -99,6 +100,25 @@ public class Patient extends Person {
 
     public void delAppt(Appointment appt) {
         this.apptList.remove(appt);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+
+        if (!(other instanceof Patient)) {
+            return false;
+        }
+
+        Patient otherPatient = (Patient) other;
+        return super.equals(otherPatient) && patientId == otherPatient.patientId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), patientId);
     }
 
 }

@@ -1,5 +1,7 @@
 package seedu.address.model.person;
 
+import java.util.Objects;
+
 /**
  * Represents a doctor in the app.
  * Extends {@code Person} to support the new 'adddoc' command.
@@ -73,5 +75,24 @@ public class Doctor extends Person {
 
         return otherPerson.getPhone().equals(getPhone())
                 || otherPerson.getEmail().equals(getEmail());
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+
+        if (!(other instanceof Doctor)) {
+            return false;
+        }
+
+        Doctor otherDoctor = (Doctor) other;
+        return super.equals(otherDoctor) && docId == otherDoctor.docId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), docId);
     }
 }
