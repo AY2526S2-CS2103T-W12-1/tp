@@ -206,9 +206,8 @@ public class EditApptCommandTest {
         AppointmentManager.initialise();
     }
 
-    @Test
+    @Test //written by copilot
     public void execute_editApptToNewTime_success() throws Exception {
-        //written by copilot
         Model model = new ModelManager();
         Doctor doctor = new DoctorBuilder().withName(DOCTOR_NAME).withDocId(DOCTOR_ID).build();
         Patient patient = new PatientBuilder().withName(PATIENT_NAME).withPatId(PATIENT_ID).build();
