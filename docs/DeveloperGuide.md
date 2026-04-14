@@ -285,6 +285,93 @@ Step 5. The receptionist informs the patient of their next appointment and can p
 
 --------------------------------------------------------------------------------------------------------------------
 
+### \[Planned\] Reset Application Data
+
+#### Enhancement
+
+The proposed reset application data feature allows users to clear all information stored in the application and return it to a clean slate state. This feature is useful when the application needs to be reset for testing purposes, or when users want to start fresh with no historical data. A `reset` command will be introduced that clears all patient records, doctor records, and appointments from the system, and reinitializes the data files.
+
+The reset command will:
+
+* `reset` — Clears all data from the application (patients, doctors, and appointments).
+  * Requires user confirmation to prevent accidental data loss.
+  * Resets data files to empty state.
+  * Displays a confirmation message upon successful reset.
+
+#### Usage Scenario
+
+Step 1. The user has been testing the application with sample data for development purposes.
+
+Step 2. The user enters the command `reset`.
+
+Step 3. The system prompts the user with a confirmation dialog: "This action will delete all data in the application. Are you sure? (yes/no)"
+
+Step 4. The user confirms by typing `yes`.
+
+Step 5. The system clears all patient records, doctor records, and appointments from memory.
+
+Step 6. The system updates the data files (patients.json, doctors.json, appointments.json) to be empty.
+
+Step 7. The system displays a success message: "All application data has been cleared successfully. The application is now reset to a clean slate."
+
+Step 8. The application refreshes to show an empty patient list, doctor list, and schedule.
+
+   Use case ends.
+
+**Extensions**
+
+* 3a. The user cancels the reset operation.
+  * 3a1. System shows: `Reset operation cancelled. No data was deleted.`
+
+    Use case ends.
+
+* 4a. The user enters an invalid confirmation response (neither "yes" nor "no").
+  * 4a1. System shows: `Invalid response. Please enter 'yes' or 'no'.`
+
+    Use case resumes at step 3.
+
+#### Design Considerations
+
+**Aspect: Confirmation mechanism:**
+
+* **Alternative 1 (current choice):** Require explicit text confirmation (user types "yes").
+  * Pros: Prevents accidental deletion through misclicks, forces user to actively acknowledge the action.
+  * Cons: More verbose, requires extra typing.
+
+* **Alternative 2:** Pop-up dialog with Yes/No buttons.
+  * Pros: More user-friendly GUI interaction, faster for mouse users.
+  * Cons: Inconsistent with CLI-first design philosophy, may not work well in headless environments.
+
+* **Alternative 3:** Add a safety flag that must be explicitly enabled (e.g., `reset --force`).
+  * Pros: Requires deliberate user intent, prevents accidental data loss.
+  * Cons: Additional complexity, may confuse new users.
+
+**Aspect: Data recovery:**
+
+* **Alternative 1:** No data recovery mechanism.
+  * Pros: Simple to implement, ensures clean slate.
+  * Cons: User cannot recover accidentally deleted data.
+
+* **Alternative 2 (current choice):** Create automatic backup before reset (e.g., backup_[timestamp].json).
+  * Pros: Users can recover data if they change their mind shortly after reset.
+  * Cons: Requires additional disk space, adds complexity to backup management.
+
+* **Alternative 3:** Implement undo functionality for reset command.
+  * Pros: Provides ultimate safety net for accidental resets.
+  * Cons: Complex implementation, may consume significant memory for large datasets.
+
+**Aspect: Scope of reset:**
+
+* **Alternative 1:** Reset only specific data (patients, doctors, or appointments selectively).
+  * Pros: More granular control, allows partial resets if needed.
+  * Cons: More complex implementation, risk of leaving system in inconsistent state.
+
+* **Alternative 2 (current choice):** Reset all data at once (patients, doctors, and appointments together).
+  * Pros: Ensures consistency and clean slate, simpler to implement and understand.
+  * Cons: Less flexible for selective data clearing.
+
+--------------------------------------------------------------------------------------------------------------------
+
 ## **Documentation, logging, testing, configuration, dev-ops**
 
 * [Documentation guide](Documentation.md)
@@ -324,7 +411,6 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 | Priority | As a …​ | I want to …​                                               | So that I can…​                                             |
 |----------|----------|------------------------------------------------------------|-------------------------------------------------------------|
 | `* * *`  | new receptionist | see sample patient and practitioner data                   | understand what kind of information the system holds        |
-| `* * *`  | receptionist starting real usage | remove any existing data                                   | begin with a clean and accurate dataset                     |
 | `* * *`  | first-time user | understand what each field represents                      | avoid misusing or misunderstanding stored information       |
 | `* * *`  | receptionist | add a new patient's contact details                        | quickly reference them in future interactions               |
 | `* * *`  | receptionist | add a new doctor's contact details                         | track which doctors are available for appointments          |
@@ -334,14 +420,12 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 | `* * *`  | receptionist | book an appointment slot for a patient with a doctor       | confirm appointments during calls                           |
 | `* * *`  | receptionist | cancel an existing appointment                             | free up slots when patients reschedule or cancel            |
 | `* *`    | receptionist | search for a patient by name                               | look up their contact details                               |
-| `* *`    | receptionist | search for a patient using a phone number                  | identify callers immediately                                |
 | `* *`    | receptionist | view a patient's contact details in one place              | avoid asking the patient for information repeatedly         |
 | `* *`    | receptionist | update a patient's contact information                     | keep records accurate                                       |
 | `* *`    | receptionist | see which practitioners are currently on duty              | avoid giving incorrect availability information to patients |
 | `* *`    | receptionist | quickly switch between different practitioners' schedules  | compare availability during a call                          |
 | `* *`    | receptionist who types fast | perform common actions using the keyboard                  | avoid slowing down to use the mouse                         |
 | `* *`    | receptionist | correct mistakes quickly                                   | ensure small typing errors don't disrupt my workflow        |
-| `* *`    | long-time receptionist | clean up outdated entries                                  | keep the system efficient over time                         |
 | `*`      | receptionist | check upcoming availability without leaving my current task | stay focused during calls                                   |
 | `*`      | receptionist | return to my previous view quickly                         | avoid losing context during busy periods                    |
 | `*`      | receptionist returning after a break | quickly regain an overview of practitioners and patients   | resume work smoothly                                        |
