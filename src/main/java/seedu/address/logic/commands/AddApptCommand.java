@@ -50,8 +50,8 @@ public class AddApptCommand extends Command {
         requireNonNull(model);
 
         try {
-            model.addAppt(toAdd);
             AppointmentManager.addAppointment(toAdd);
+            model.addAppt(toAdd);
         } catch (IOException e) {
             // Rollback if one of the two persistence steps fails.
             try {
