@@ -553,7 +553,8 @@ public class ModelManager implements Model {
         String newName = newDoctor.getName().fullName;
 
         if (!oldName.equals(newName)) {
-            seedu.address.storage.AppointmentManager.updateDoctorNameInAppointments(oldName, newName);
+            seedu.address.storage.AppointmentManager.updateDoctorNameInAppointments(
+                    newDoctor.getDocId(), newName);
         }
     }
 
@@ -565,7 +566,8 @@ public class ModelManager implements Model {
         String newName = newPatient.getName().fullName;
 
         if (!oldName.equals(newName)) {
-            seedu.address.storage.AppointmentManager.updatePatientNameInAppointments(oldName, newName);
+            seedu.address.storage.AppointmentManager.updatePatientNameInAppointments(
+                    newPatient.getPatientId(), newName);
         }
     }
 
@@ -626,9 +628,14 @@ public class ModelManager implements Model {
         patients.setPatient(target, editedPatient);
         addressBook.setPerson(target, editedPatient);
 
-
         updatePatientNameInAppointmentList(target, editedPatient);
 
+        try {
+            updatePatientAppointmentsInStorage(target, editedPatient);
+            updatePatientInSchedule(target, editedPatient);
+        } catch (IOException e) {
+            logger.warning("Failed to update patient appointments in storage: " + e.getMessage());
+        }
     }
     //=========== Filtered Person List Accessors =============================================================
 

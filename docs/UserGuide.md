@@ -89,7 +89,7 @@ The table below summarises the rules and constraints for all input fields used a
 <box type="info" seamless>
 
 **Additional assumptions:**
-* **Doctor duplicate detection:** Two doctors are considered duplicates if they share the same name (case-insensitive) **and** either the same phone number or the same email.
+* **Doctor duplicate detection:** Two doctors are considered duplicates if they share the same phone number **or** the same email, regardless of name. Doctors with the same name but different phone numbers and emails are allowed.
 * **Patient duplicate detection:** Two patients are considered duplicates if they share the same name (case-insensitive) **and** the same email.
 * **Schedule window:** Doctor schedules are displayed and bookable for a rolling 7-day window from today.
 * **Schedule slots:** Schedule uses 30-minute slots from 09:00 to 16:30. Appointments can only be booked within these slots.
@@ -257,6 +257,9 @@ Format: `viewsched d/DOCTOR_NAME id/DOCTOR_ID [date/YYYY-MM-DD]`
 * If you request a date outside the available schedule window, the app shows `No schedule available for this date.`
 * Appointment slots are displayed in half-hourly intervals from 09:00 to 16:30.
 * The schedule panel uses light blocks for available slots and darker blocks for booked slots.
+
+**Caution**
+In case, the schedule panel does not show the full slot details with appt id and patient id in your OS, please drag and resize using the double-headed arrow when you hover near the corner of the window.
 
 Examples:
 * `viewsched d/John Tan id/1 date/2026-04-10` displays John Tan's schedule on 10 Apr 2026.
