@@ -28,7 +28,7 @@ CLInicDesk is optimized for use through a Command Line Interface (CLI) while sti
 1. Copy the file to the folder you want to use as the _home folder_ for your CLInicDesk.
 
 1. Open a command terminal, `cd` into the folder you put the jar file in, and use the `java -jar clinicdesk.jar` command to run the application.<br>
-   A GUI similar to the below should appear in a few seconds. Note how the app contains some sample data.<br>
+   A GUI similar to the below should appear in a few seconds.<br>
    <div class="image-container">
 
    ![Ui](images/Ui.png)
@@ -40,7 +40,7 @@ CLInicDesk is optimized for use through a Command Line Interface (CLI) while sti
 
    * `list` : Lists all patients and doctors.
    * `adddoc n/John Doe p/98765432 e/johnd@doctor.com a/John street, block 123, #01-01` : Adds a doctor named `John Doe`.
-   * `deldoc 3` : Deletes the 3rd doctor shown in the current list.
+   * `deldoc 3` : Deletes the 3rd entry shown in the current list, provided that it represents a doctor.
    * `clear` : Clears all entries from the display.
    * `exit` : Exits the app.
 
@@ -56,6 +56,7 @@ CLInicDesk is optimized for use through a Command Line Interface (CLI) while sti
 
 <table class="convention-table">
 <tr><th>Convention</th><th>Meaning</th><th>Example</th></tr>
+<tr><td><code>lower_case</code></td><td>A command</td><td><code>list</code></td></tr>
 <tr><td><code>UPPER_CASE</code></td><td>A parameter you supply</td><td><code>adddoc n/NAME</code> → <code>adddoc n/John Doe</code></td></tr>
 <tr><td><code>[square brackets]</code></td><td>Optional field</td><td><code>viewsched d/DOCTOR_NAME id/DOCTOR_ID [date/YYYY-MM-DD]</code></td></tr>
 <tr><td>Any parameter order</td><td>Parameters can appear in any order</td><td><code>n/NAME p/PHONE</code> or <code>p/PHONE n/NAME</code></td></tr>
@@ -73,25 +74,29 @@ The table below summarises the rules and constraints for all input fields used a
 
 <table class="constraints-table">
 <tr><th>Field</th><th>Constraints</th></tr>
-<tr><td><strong>NAME</strong></td><td>Alphabets, hyphens, apostrophe and/or spaces only. Case-insensitive for matching (e.g. <code>john doe</code> matches <code>John Doe</code>). Must not be blank.</td></tr>
-<tr><td><strong>PHONE_NUMBER</strong></td><td>Numeric digits only. Must be 8 digits long.</td></tr>
+<tr><td><strong>NAME</strong></td><td>Alphabets, hyphens, apostrophe, forward slashes, and/or spaces only. Case-insensitive for matching (e.g. <code>john doe</code> matches <code>John Doe</code>). Must not be blank.</td></tr>
+<tr><td><strong>PHONE_NUMBER</strong></td><td>Numeric digits only. Must be at least 3 digits long.</td></tr>
 <tr><td><strong>EMAIL</strong></td><td>Must follow the standard <code>local-part@domain</code> format (e.g. <code>name@example.com</code>).</td></tr>
 <tr><td><strong>ADDRESS</strong></td><td>Any non-blank string, minimum 3 characters.</td></tr>
 <tr><td><strong>INDEX</strong></td><td>A positive integer (1, 2, 3, …) referring to the position in the currently displayed list.</td></tr>
+<tr><td><strong>DOCTOR_ID / PATIENT_ID</strong></td><td>The numeric ID shown on each person's card in the displayed list. Must be a positive integer.</td></tr>
+<tr><td><strong>APPOINTMENT_ID</strong></td><td>The numeric ID returned when an appointment is created via <code>addappt</code>. Must be a non-negative integer.</td></tr>
 <tr><td><strong>DATE</strong> (<code>YYYY-MM-DD</code>)</td><td>Must be in strict ISO 8601 format (e.g. <code>2026-04-10</code>). Must be today or within the next 7 days.</td></tr>
 <tr><td><strong>TIME</strong> (<code>HH:MM</code>)</td><td>Must be one of the half-hourly slots from <code>09:00</code> to <code>16:30</code> (i.e. <code>09:00</code>, <code>09:30</code>, <code>10:00</code>, … <code>16:30</code>).</td></tr>
-<tr><td><strong>DOCTOR_NAME</strong></td><td>Must exactly match an existing doctor's name (case-insensitive).</td></tr>
-<tr><td><strong>PATIENT_NAME</strong></td><td>Must exactly match an existing patient's name (case-insensitive).</td></tr>
+<tr><td><strong>DOCTOR_NAME</strong></td><td>Must exactly match an existing doctor's name (case-insensitive). Used with <code>viewsched</code>.</td></tr>
 </table>
 
 <box type="info" seamless>
 
 **Additional assumptions:**
-* **Doctor duplicate detection:** Two doctors are considered duplicates if they share the same name (case-insensitive) **and** either the same phone number or the same email.
+* **Doctor duplicate detection:** Two doctors are considered duplicates if they share the same phone number **or** the same email, regardless of name. Doctors with the same name but different phone numbers and emails are allowed.
+* **Patient duplicate detection:** Two patients are considered duplicates if they share the same name (case-insensitive) **and** the same email.
 * **Schedule window:** Doctor schedules are displayed and bookable for a rolling 7-day window from today.
+* **Schedule slots:** Schedule uses 30-minute slots from 09:00 to 16:30. Appointments can only be booked within these slots.
 * **Doctor IDs:** Each doctor is automatically assigned a unique, persistent ID that is preserved across edits. IDs are not user-editable.
 * **Patient IDs:** Each patient is automatically assigned a unique, persistent ID that is preserved across edits. IDs are not user-editable.
-* **Patient duplicate detection:** Two patients are considered duplicates if they share the same name (case-insensitive) **and** the same email.
+* **Appointment IDs:** Each appointment is automatically assigned a unique ID that is returned to the user when the appointment is created. IDs are not user-editable.
+* **IDs do not exceed `Integer.MAX_VALUE`:** The system assumes the ID counter never overflows.
 
 </box>
 
@@ -108,8 +113,8 @@ Adds a doctor to the app.
 Format: `adddoc n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS`
 
 **Notes:**
-* `NAME` is the name of the doctor. It should not be blank. Only alphabets, followed by hyphens, apostrophe and/or spaces are allowed.
-* `PHONE_NUMBER` should only contain numbers and be 8 digits.
+* `NAME` is the name of the doctor. It should not be blank. Only alphabets, followed by hyphens, apostrophe, forward slash, and/or spaces are allowed.
+* `PHONE_NUMBER` should only contain numbers and be at least 3 digits long.
 * `EMAIL` must match the standard email format (e.g. `name@example.com`).
 
 Examples:
@@ -118,7 +123,7 @@ Examples:
 
 Expected output:
 ```
-New doctor added: John Doe; Phone: 98765432; Email: johnd@doctor.com; Address: John street, block 123, #01-01
+New doctor added: John Doe; Phone: 98765432; Email: johnd@doctor.com; Address: John street, block 123, #01-01; Tags: Doctor
 ```
 
 #### Editing a doctor : `editdoc`
@@ -139,7 +144,7 @@ Examples:
 
 Expected output:
 ```
-Edited Doctor: John Doe; Phone: 91234567; Email: johnd@doctor.com; Address: 21 Bencoolen
+Edited Doctor: John Doe; Phone: 91234567; Email: johnd@doctor.com; Address: 21 Bencoolen; Tags: Doctor
 ```
 
 #### Deleting a doctor : `deldoc`
@@ -154,11 +159,12 @@ Format: `deldoc INDEX`
 * The index **must be a positive integer** 1, 2, 3, …​
 
 Examples:
-* If the list shows (1) Patient, (2) Doctor, (3) Patient — type `deldoc 2` to delete the doctor.
+* `deldoc 2` deletes the 2nd entry in the displayed list, provided it is a doctor.
 
 Expected output:
 ```
-Deleted Doctor: John Doe; Phone: 98765432; Email: johnd@doctor.com; Address: John street, block 123, #01-01
+Deleted Doctor: John Doe; Phone: 98765432; Email: johnd@doctor.com; Address: John street, block 123, #01-01; Tags: Doctor
+ & any linked appointments
 ```
 
 --------------------------------------------------------------------------------------------------------------------
@@ -174,8 +180,8 @@ Adds a patient to the app.
 Format: `addpat n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS`
 
 **Notes:**
-* `NAME` is the name of the patient. It should not be blank. Only alphabets, followed by hyphens, apostrophe and/or spaces are allowed.
-* `PHONE_NUMBER` should only contain numbers and be 8 digits.
+* `NAME` is the name of the patient. It should not be blank. Only alphabets, followed by hyphens, apostrophe, forward slash, and/or spaces are allowed.
+* `PHONE_NUMBER` should only contain numbers and be at least 3 digits long.
 * `EMAIL` must match the standard email format (e.g. `name@example.com`).
 
 Examples:
@@ -184,7 +190,7 @@ Examples:
 
 Expected output:
 ```
-New patient added: John Doe; Phone: 98765432; Email: johnd@example.com; Address: John street, block 123, #01-01
+New patient added: John Doe; Phone: 98765432; Email: johnd@example.com; Address: John street, block 123, #01-01; Tags: Patient
 ```
 
 #### Editing a patient : `editpat`
@@ -204,7 +210,7 @@ Examples:
 
 Expected output:
 ```
-Edited Patient: John Doe; Phone: 91234567; Email: johndoe@example.com; Address: 123456
+Edited Patient: John Doe; Phone: 91234567; Email: johndoe@example.com; Address: 123456; Tags: Patient
 ```
 
 #### Deleting a patient : `delpat`
@@ -223,7 +229,7 @@ Examples:
 
 Expected output:
 ```
-Deleted Patient: John Doe; Phone: 98765432; Email: johnd@example.com; Address: John street, block 123, #01-01
+Deleted Patient: John Doe; Phone: 98765432; Email: johnd@example.com; Address: John street, block 123, #01-01; Tags: Patient
 ```
 
 --------------------------------------------------------------------------------------------------------------------
@@ -253,18 +259,30 @@ Format: `viewsched d/DOCTOR_NAME id/DOCTOR_ID [date/YYYY-MM-DD]`
 * Appointment slots are displayed in half-hourly intervals from 09:00 to 16:30.
 * The schedule panel uses light blocks for available slots and darker blocks for booked slots.
 
+**Caution**
+If the schedule panel does not show the full slot details with appointment ID and patient ID on your OS, please drag and resize it using the double-headed arrow when you hover near the corner of the window.
+
 Examples:
 * `viewsched d/John Tan id/1 date/2026-04-10` displays John Tan's schedule on 10 Apr 2026.
 * `viewsched d/Alice Lim id/2` displays Alice Lim's schedule for the next 7 days.
-
-Screenshot placeholder: add a single-day schedule panel screenshot here.
-
-Screenshot placeholder: add a weekly schedule panel screenshot here.
 
 Expected output:
 ```
 Schedule for John Tan (ID: 1) on 2026-04-10
 ```
+
+<div class="image-container">
+
+![result for 'Daily Schedule Panel'](images/daily_schedule.png)
+
+</div>
+
+<div class="image-container">
+
+![result for 'Weekly Schedule Panel'](images/weekly_schedule.png)
+
+</div>
+
 
 #### Adding an appointment : `addappt`
 
@@ -278,11 +296,8 @@ Format: `addappt id/DOCTOR_ID pid/PATIENT_ID date/YYYY-MM-DD time/H:MM`
 * Time must be in 30-minute intervals from 09:00 to 16:30 (e.g. 09:00, 09:30, 10:00, …, 16:30).
 
 Examples:
-<<<<<<< update-UG
 * `addappt id/1 pid/3 date/2026-04-10 time/09:00` books an appointment for patient 3 with doctor 1 on 2026-04-10 at 9am.
-=======
-* `addappt d/John Tan n/Jane date/2026-04-10 time/09:00` books an appointment for Jane in Dr John Tan's schedule on 2026-04-10 at 9am. A subsequent `viewsched d/John Tan id/1 date/2026-04-10` command will show the 9am slot as `Booked`.
->>>>>>> master
+
 
 Expected output:
 ```
@@ -324,15 +339,12 @@ Format: `delappt apptid/APPOINTMENT_ID`
 * The appointment ID is a unique identifier for each appointment.
 
 Examples:
-<<<<<<< update-UG
 * `delappt apptid/3` deletes the appointment with ID 3.
-=======
-* If the 9am slot for Dr John Tan on 2026-04-10 was booked, then `delappt d/John Tan n/Jane date/2026-04-10 time/09:00` followed by `viewsched d/John Tan id/1 date/2026-04-10` will show the 9am slot as `Available`.
->>>>>>> master
+
 
 Expected output:
 ```
-Edited Patient: John Doe; Phone: 91234567; Email: johndoe@example.com; Address: 123456; Tags:
+Appointment deleted!
 ```
 ## Editing an appointment : `editappt`
 Edits the details of an existing appointment
@@ -344,13 +356,16 @@ Format : `editappt apptid/APPT_ID (nd/NEW_DOC) (ndate/NEW_DATE) (ntime/NEW_TIME)
 e.g. `editappt apptid/ID ntime/10:00` is acceptable and will rebook the slot to 10am
 for the same patient,but `editappt apptid/ID` is invalid on its own.
 
-### Listing all persons : `list`
+#### Listing all persons : `list`
 
 Shows a list of all persons (doctors and patients) in the app.
 
 Format: `list`
 
-### Locating persons by name: `find`
+**Notes:**
+* Any invalid or extra parameters added after the command will be ignored, and the `list` command will still work as intended. e.g. `list 3`, `list bla bla` will work.
+
+#### Locating persons by name: `find`
 
 Finds persons whose names contain any of the given keywords.
 
@@ -366,11 +381,15 @@ Format: `find KEYWORD [MORE_KEYWORDS]`
 Examples:
 * `find John` returns `john` and `John Doe`
 * `find alex david` returns `Alex Yeoh`, `David Li`<br>
+  <div class="image-container">
+
   ![result for 'find alex david'](images/findAlexDavidResult.png)
+
+  </div>
 
 #### Clearing all entries : `clear`
 
-Clears all entries from the app UI temporarily. This does not delete data.
+Clears all entries from the app display temporarily. Use `list` to show all entries again. This does not delete data.
 
 Format: `clear`
 
@@ -392,7 +411,8 @@ CLInicDesk data is saved to the hard disk automatically after any command that c
 
 * Doctor data is saved automatically to `[JAR file location]/data/doctors.json`.
 * Patient data is saved automatically to `[JAR file location]/data/patients.json`.
-* Appointment data is saved automatically to `[JAR file location]/data/schedule.json`.
+* Appointment data is saved automatically to `[JAR file location]/data/appointments.json`.
+* Schedule data is saved automatically to `[JAR file location]/data/schedule.json`.
 
 Advanced users are welcome to update data directly by editing these files.
 
@@ -403,6 +423,7 @@ If your changes to a data file make its format invalid, CLInicDesk will discard 
 Furthermore, certain edits can cause CLInicDesk to behave in unexpected ways (e.g. if a value entered is outside the acceptable range). Therefore, edit the data files only if you are confident that you can update them correctly.
 
 </box>
+
 --------------------------------------------------------------------------------------------------------------------
 
 ## FAQ

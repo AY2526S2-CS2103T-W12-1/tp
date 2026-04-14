@@ -22,6 +22,7 @@ import seedu.address.model.appointment.Appointment;
 import seedu.address.model.person.Doctor;
 import seedu.address.model.person.Patient;
 import seedu.address.model.person.Person;
+import seedu.address.storage.AppointmentManager;
 import seedu.address.storage.ScheduleManager;
 
 /**
@@ -177,6 +178,16 @@ public class ModelManager implements Model {
     }
 
     @Override
+    public boolean hasDoctorExcluding(Doctor doctor, int excludeId) {
+        requireNonNull(doctor);
+        return doctors.getPersonList().stream()
+                .filter(p -> p instanceof Doctor)
+                .map(p -> (Doctor) p)
+                .filter(d -> d.getDocId() != excludeId)
+                .anyMatch(d -> d.isSamePerson(doctor));
+    }
+
+    @Override
     public boolean hasPatient(Patient patient) {
         requireNonNull(patient);
         return patients.hasPerson(patient);
@@ -192,20 +203,17 @@ public class ModelManager implements Model {
     public void deletePatient(Patient patient) {
         patients.removePatient(patient);
         addressBook.removePatient(patient);
-        try {
-            deletePatientByAppt(patient);
-        } catch (IOException e) {
-            logger.warning("Failed to delete patient's appointments: " + e.getMessage());
-        }
+        deletePatientByAppt(patient);
     }
 
     /**
      * Helper function to find a patient and remove all their appointments from the schedule.
      */
-    private void deletePatientByAppt(Patient patient) throws IOException {
+    private void deletePatientByAppt(Patient patient) {
         for (Appointment appt : patient.getApptList()) {
             ScheduleManager.removeApptIfExists(appt);
         }
+        AppointmentManager.deleteAppointmentsByPatientId(patient.getPatientId());
     }
 
     @Override
@@ -273,6 +281,13 @@ public class ModelManager implements Model {
         }
         appt.setPatName(patient.getName().fullName);
 
+        // Check if patient already has appointment at this time
+        for (Appointment existing : patient.getApptList()) {
+            if (existing.getDate().equals(appt.getDate()) && existing.getTime().equals(appt.getTime())) {
+                throw new IOException("Patient already has an appointment at this time");
+            }
+        }
+
         Doctor doctor = findDoctorById(appt.getDocId());
         if (doctor == null) {
             throw new IOException("Doctor not found: " + appt.getDocId());
@@ -335,11 +350,7 @@ public class ModelManager implements Model {
 
         String scheduledPatName = ScheduleManager.getPatientAtSlotByDocId(oldDocId, oldDate, standardizedOldTime);
         if (scheduledPatName == null) {
-            throw new IOException("No appointment exists at: " + oldDocName + " on " + oldDate + " at " + oldTime);
-        }
-
-        if (!scheduledPatName.equalsIgnoreCase(oldPatName)) {
-            throw new IOException("Appointment details do not match the schedule.");
+            throw new IOException("No appointment exists at: " + oldDocId + " on " + oldDate + " at " + oldTime);
         }
 
         int finalDocId = oldDocId;
@@ -542,7 +553,9 @@ public class ModelManager implements Model {
         String newName = newDoctor.getName().fullName;
 
         if (!oldName.equals(newName)) {
-            seedu.address.storage.AppointmentManager.updateDoctorNameInAppointments(oldName, newName);
+            seedu.address.storage.AppointmentManager.updateDoctorNameInAppointments(
+                    newDoctor.getDocId(), newName);
+            ScheduleManager.renameDoctorSchedule(newDoctor);
         }
     }
 
@@ -554,7 +567,8 @@ public class ModelManager implements Model {
         String newName = newPatient.getName().fullName;
 
         if (!oldName.equals(newName)) {
-            seedu.address.storage.AppointmentManager.updatePatientNameInAppointments(oldName, newName);
+            seedu.address.storage.AppointmentManager.updatePatientNameInAppointments(
+                    newPatient.getPatientId(), newName);
         }
     }
 
@@ -567,6 +581,23 @@ public class ModelManager implements Model {
 
         if (!oldName.equals(newName)) {
             ScheduleManager.updatePatientNameInSchedule(oldName, newName);
+        }
+    }
+
+    /**
+     * Updates appointment names in the patient's internal appointment list when name changes.
+     * This ensures consistency when later deleting the patient.
+     */
+    private void updatePatientNameInAppointmentList(Patient oldPatient, Patient newPatient) {
+        String oldName = oldPatient.getName().fullName;
+        String newName = newPatient.getName().fullName;
+
+        if (!oldName.equals(newName)) {
+            for (Appointment appt : newPatient.getApptList()) {
+                if (appt.getPatName() != null && appt.getPatName().equalsIgnoreCase(oldName)) {
+                    appt.setPatName(newName);
+                }
+            }
         }
     }
 
@@ -598,11 +629,13 @@ public class ModelManager implements Model {
         patients.setPatient(target, editedPatient);
         addressBook.setPerson(target, editedPatient);
 
+        updatePatientNameInAppointmentList(target, editedPatient);
+
         try {
             updatePatientAppointmentsInStorage(target, editedPatient);
             updatePatientInSchedule(target, editedPatient);
         } catch (IOException e) {
-            logger.warning("Failed to update patient in storage: " + e.getMessage());
+            logger.warning("Failed to update patient appointments in storage: " + e.getMessage());
         }
     }
     //=========== Filtered Person List Accessors =============================================================

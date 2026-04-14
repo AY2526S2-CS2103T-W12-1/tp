@@ -7,6 +7,7 @@ import static seedu.address.testutil.Assert.assertThrows;
 import java.io.File;
 import java.nio.file.Files;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -29,6 +30,7 @@ import seedu.address.testutil.PatientBuilder;
 public class EditApptCommandTest {
     private static final String SCHEDULE_FILE_PATH = "data/schedule.json";
     private static final String APPT_FILE_PATH = "data/appointments.json";
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final String DOCTOR_NAME = "John Tan";
     private static final int DOCTOR_ID = 1;
     private static final String PATIENT_NAME = "Jane Doe";
@@ -102,6 +104,23 @@ public class EditApptCommandTest {
     }
 
     @Test
+    public void execute_noChanges_returnsNoChangeMessage() throws Exception {
+        Model model = new ModelManager();
+        Doctor doctor = new DoctorBuilder().withName(DOCTOR_NAME).withDocId(DOCTOR_ID).build();
+        Patient patient = new PatientBuilder().withName(PATIENT_NAME).withPatId(PATIENT_ID).build();
+        model.addDoctor(doctor);
+        model.addPatient(patient);
+        patient.addAppt(new Appointment(DOCTOR_ID, DOCTOR_NAME, PATIENT_ID, PATIENT_NAME,
+                date.toString(), "09:30", APPT_ID));
+
+        EditApptCommand command = new EditApptCommand(APPT_ID, String.valueOf(DOCTOR_ID), date.toString(),
+                "09:30");
+        CommandResult result = command.execute(model);
+
+        assertEquals(EditApptCommand.MESSAGE_NO_CHANGES, result.getFeedbackToUser());
+    }
+
+    @Test
     public void execute_invalidTime_showsError() throws Exception {
         Model model = new ModelManager();
         Doctor doctor = new DoctorBuilder().withName(DOCTOR_NAME).withDocId(DOCTOR_ID).build();
@@ -143,6 +162,13 @@ public class EditApptCommandTest {
         assertThrows(Exception.class, () -> command.execute(model));
     }
 
+    @Test
+    public void execute_apptIdNotFound_throwsCommandException() throws Exception {
+        Model model = new ModelManager();
+        EditApptCommand command = new EditApptCommand(9999, null, null, "10:00");
+        assertThrows(Exception.class, () -> command.execute(model));
+    }
+
     private void writeScheduleWithSlots(int doctorId, String doctorName, String dateValue, Map<String, String> slots)
             throws Exception {
         Map<String, Object> data = new LinkedHashMap<>();
@@ -178,5 +204,23 @@ public class EditApptCommandTest {
         file.getParentFile().mkdirs();
         mapper.writerWithDefaultPrettyPrinter().writeValue(file, data);
         AppointmentManager.initialise();
+    }
+
+    @Test
+    public void execute_editApptToNewTime_success() throws Exception {
+        //written by copilot
+        Model model = new ModelManager();
+        Doctor doctor = new DoctorBuilder().withName(DOCTOR_NAME).withDocId(DOCTOR_ID).build();
+        Patient patient = new PatientBuilder().withName(PATIENT_NAME).withPatId(PATIENT_ID).build();
+        model.addDoctor(doctor);
+        model.addPatient(patient);
+        patient.addAppt(new Appointment(DOCTOR_ID, DOCTOR_NAME, PATIENT_ID, PATIENT_NAME,
+                date.toString(), "09:30", APPT_ID));
+
+        EditApptCommand command = new EditApptCommand(APPT_ID, null, null, "10:00");
+        command.execute(model);
+
+        Appointment edited = AppointmentManager.getAppointmentById(APPT_ID);
+        assertEquals("10:00", edited.getTime());
     }
 }

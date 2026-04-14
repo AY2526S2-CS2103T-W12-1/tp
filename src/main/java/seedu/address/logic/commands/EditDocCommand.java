@@ -23,7 +23,6 @@ import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
-import seedu.address.storage.ScheduleManager;
 
 /**
  * Edits the details of an existing doctor in the app.
@@ -80,22 +79,11 @@ public class EditDocCommand extends Command {
         Doctor doctorToEdit = (Doctor) personToEdit;
         Doctor editedDoctor = createEditedDoctor(doctorToEdit, editDoctorDescriptor);
 
-        if (!doctorToEdit.isSamePerson(editedDoctor) && model.hasDoctor(editedDoctor)) {
+        if (model.hasDoctorExcluding(editedDoctor, doctorToEdit.getDocId())) {
             throw new CommandException(MESSAGE_DUPLICATE_DOCTOR);
         }
 
-        String currDoctorName = doctorToEdit.getName().fullName;
-        String newDoctorName = editedDoctor.getName().fullName;
-
         model.setDoctor(doctorToEdit, editedDoctor);
-
-        if (!currDoctorName.equalsIgnoreCase(newDoctorName)) {
-            try {
-                ScheduleManager.renameDoctorSchedule(editedDoctor);
-            } catch (java.io.IOException e) {
-                throw new CommandException(Messages.MESSAGE_SCHEDULE_UPDATE_FAILED);
-            }
-        }
 
         model.updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
         return new CommandResult(String.format(MESSAGE_EDIT_DOCTOR_SUCCESS, Messages.format(editedDoctor)));

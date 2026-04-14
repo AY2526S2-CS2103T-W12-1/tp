@@ -201,7 +201,6 @@ public class ScheduleManager {
         String patName = appt.getPatName();
         String date = appt.getDate();
         String time = appt.getTime();
-        boolean found = false;
 
         if (!isValidDate(date)) {
             throw new IOException("Please input a valid date. The date must be formatted as YYYY-MM-DD");
@@ -209,7 +208,7 @@ public class ScheduleManager {
         //checks if date is within 7 days
         LocalDate apptDate = LocalDate.parse(date);
         LocalDate today = LocalDate.now();
-        LocalDate sevenDaysLater = today.plusDays(7);
+        LocalDate sevenDaysLater = today.plusDays(6);
 
         if (apptDate.isBefore(today) || apptDate.isAfter(sevenDaysLater)) {
             throw new IOException("Appointment date must be within 7 days from today!");
@@ -218,6 +217,7 @@ public class ScheduleManager {
         if (!isValidTime(time)) {
             throw new IOException("Please input a valid time. Time must be formatted as H:MM (e.g. 9:00 or 09:00)");
         }
+
 
         ObjectMapper mapper = new ObjectMapper();
         File file = new File(FILE_PATH);
@@ -239,9 +239,15 @@ public class ScheduleManager {
             LocalTime apptTime = LocalTime.parse(time, inputFormatter);
             LocalTime firstTime = LocalTime.parse(sortedSlots.firstKey(), storageFormatter);
             LocalTime lastTime = LocalTime.parse(sortedSlots.lastKey(), storageFormatter);
+            LocalTime now = LocalTime.now();
 
             if (apptTime.isBefore(firstTime) || apptTime.isAfter(lastTime)) {
                 throw new IOException("Please choose a time within operating hours");
+            }
+            if (apptTime.isBefore(now) && apptDate.isEqual(today)) {
+                throw new IOException("This slot has passed, "
+                                        + "Please choose a time after " + now.format(storageFormatter));
+
             }
 
             // Formats input into JSON key format, to prevent dummy entries/overwrites.
@@ -251,10 +257,12 @@ public class ScheduleManager {
                 throw new IOException("The time " + time + " is not a valid 30-minute slot for this doctor.");
             }
 
-            if (slots.get(standardizedTime) == null) {
+            String occupant = slots.get(standardizedTime);
+            if (occupant == null) {
                 slots.put(standardizedTime, patName);
-                found = true;
                 mapper.writerWithDefaultPrettyPrinter().writeValue(file, data);
+            } else if (occupant.equalsIgnoreCase(patName)) {
+                throw new IOException("This appointment already exists");
             } else {
                 throw new IOException("This slot is already booked. "
                         + "Please edit the appointment if you wish to change it");
@@ -264,9 +272,6 @@ public class ScheduleManager {
             throw new IOException("Doctor not registered");
 
         }
-        mapper.writerWithDefaultPrettyPrinter().writeValue(file, data);
-        System.out.println("sched added appt");
-
     }
 
     /**
@@ -276,7 +281,7 @@ public class ScheduleManager {
      */
     private static boolean isValidDate(String date) {
         try {
-            LocalDate formattedDate = LocalDate.parse(date);
+            LocalDate.parse(date);
             return true;
         } catch (DateTimeParseException e) {
             return false;
@@ -290,7 +295,7 @@ public class ScheduleManager {
      */
     private static boolean isValidTime(String time) {
         try {
-            LocalTime formattedDate = LocalTime.parse(time, DateTimeFormatter.ofPattern("H:mm"));
+            LocalTime.parse(time, DateTimeFormatter.ofPattern("H:mm"));
             return true;
         } catch (DateTimeParseException e) {
             return false;
@@ -369,7 +374,9 @@ public class ScheduleManager {
         try {
             Map<String, Object> data = readScheduleFile();
 
-            String matchedDoctor = findDoctorKey(data, appt.getDocName());
+            String matchedDoctor = appt.getDocId() != Appointment.UNASSIGNED_ID
+                    ? findDoctorKeyByDocId(data, appt.getDocId())
+                    : findDoctorKey(data, appt.getDocName());
             if (matchedDoctor == null) {
                 return;
             }
@@ -649,22 +656,6 @@ public class ScheduleManager {
         for (int i = 0; i < SCHEDULE_WINDOW_DAYS; i++) {
             LocalDate date = startDate.plusDays(i);
             doctorSchedule.put(date.toString(), createEmptySlots());
-        }
-
-        return doctorSchedule;
-    }
-
-    private static Map<String, Object> normalizeDoctorSchedule(Object scheduleData, Doctor doctor) {
-        Map<String, Object> doctorSchedule = new LinkedHashMap<>();
-        doctorSchedule.put(DOC_ID_KEY, doctor.getDocId());
-        doctorSchedule.put(DOCTOR_NAME_KEY, doctor.getName().fullName);
-
-        if (scheduleData instanceof Map<?, ?> scheduleMap) {
-            for (Map.Entry<?, ?> entry : scheduleMap.entrySet()) {
-                if (entry.getKey() instanceof String && !isMetadataKey((String) entry.getKey())) {
-                    doctorSchedule.put((String) entry.getKey(), entry.getValue());
-                }
-            }
         }
 
         return doctorSchedule;

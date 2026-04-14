@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -95,18 +96,50 @@ public class ScheduleManagerTest {
         assertNull(ScheduleManager.getScheduleByDocId(99, LocalDate.now().toString()));
     }
 
+    @Test
+    public void getScheduleByDocId_missingDate_throwsIllegalArgumentException() throws Exception {
+        LocalDate today = LocalDate.now();
+        writeScheduleFile(createDoctor(1, "John Tan"), today, null);
+
+        String futureDate = today.plusDays(2).toString();
+
+        assertThrows(IllegalArgumentException.class, () -> ScheduleManager.getScheduleByDocId(1, futureDate));
+    }
+
     // test written by codex
     @Test
     public void addAppt_validAppointment_booksSlot() throws Exception {
         LocalDate today = LocalDate.now();
-        writeScheduleFile(createDoctor(1, "John Tan"), today, null);
+        writeScheduleFile(createDoctor(1, "John Tan"), today.plusDays(1), null);
 
-        Appointment appt = new Appointment(1, "John Tan", 2, "Jane Lim", today.toString(), "09:00", -1);
+        Appointment appt = new Appointment(1, "John Tan", 2, "Jane Lim", today.plusDays(1).toString(), "09:00", -1);
         ScheduleManager.addAppt(appt);
 
-        Map<String, String> schedule = ScheduleManager.getScheduleByDocId(1, today.toString());
+        Map<String, String> schedule = ScheduleManager.getScheduleByDocId(1, today.plusDays(1).toString());
         assertEquals("Jane Lim", schedule.get("09:00"));
-        assertEquals("Jane Lim", ScheduleManager.getPatientAtSlot("John Tan", today.toString(), "09:00"));
+        assertEquals("Jane Lim", ScheduleManager.getPatientAtSlot("John Tan", today.plusDays(1).toString(), "09:00"));
+    }
+
+    @Test
+    public void getPatientAtSlotByDocId_existingAppointment_returnsPatient() throws Exception {
+        LocalDate futureDate = LocalDate.now().plusDays(1);
+        writeScheduleFile(createDoctor(1, "John Tan"), futureDate, null);
+
+        Appointment appt = new Appointment(1, "John Tan", 2, "Jane Lim", futureDate.toString(), "09:00", -1);
+        ScheduleManager.addAppt(appt);
+
+        assertEquals("Jane Lim", ScheduleManager.getPatientAtSlotByDocId(1, futureDate.toString(), "09:00"));
+    }
+
+    @Test
+    public void getPatientAtSlot_existingAppointment_returnsPatient() throws Exception {
+        LocalDate futureDate = LocalDate.now().plusDays(1);
+        writeScheduleFile(createDoctor(1, "John Tan"), futureDate, null);
+
+        Appointment appt = new Appointment(1, "John Tan", 7, "Jane Lim", futureDate.toString(), "09:00", -1);
+        ScheduleManager.addAppt(appt);
+
+        assertEquals("Jane Lim", ScheduleManager.getPatientAtSlot("John Tan", futureDate.toString(), "09:00"));
     }
 
     @Test
@@ -121,22 +154,22 @@ public class ScheduleManagerTest {
     // test written by codex
     @Test
     public void delAppt_validAppointment_clearsSlot() throws Exception {
-        LocalDate today = LocalDate.now();
-        writeScheduleFile(createDoctor(1, "John Tan"), today, "Jane Lim");
+        LocalDate futureDate = LocalDate.now().plusDays(1);
+        writeScheduleFile(createDoctor(1, "John Tan"), futureDate, "Jane Lim");
 
-        Appointment appt = new Appointment(1, "John Tan", 2, "Jane Lim", today.toString(), "09:00", -1);
+        Appointment appt = new Appointment(1, "John Tan", 2, "Jane Lim", futureDate.toString(), "09:00", -1);
         ScheduleManager.delAppt(appt);
 
-        Map<String, String> schedule = ScheduleManager.getScheduleByDocId(1, today.toString());
+        Map<String, String> schedule = ScheduleManager.getScheduleByDocId(1, futureDate.toString());
         assertNull(schedule.get("09:00"));
     }
 
     @Test
     public void delAppt_wrongPatient_throwsIoException() throws Exception {
-        LocalDate today = LocalDate.now();
-        writeScheduleFile(createDoctor(1, "John Tan"), today, "Alice Lim");
+        LocalDate futureDate = LocalDate.now().plusDays(1);
+        writeScheduleFile(createDoctor(1, "John Tan"), futureDate, "Alice Lim");
 
-        Appointment appt = new Appointment(1, "John Tan", 2, "Jane Lim", today.toString(), "09:00", -1);
+        Appointment appt = new Appointment(1, "John Tan", 2, "Jane Lim", futureDate.toString(), "09:00", -1);
         IOException thrown = assertThrows(IOException.class, () -> ScheduleManager.delAppt(appt));
         assertEquals("No such appointment exists.", thrown.getMessage());
     }
@@ -213,6 +246,242 @@ public class ScheduleManagerTest {
         Map<String, Object> scheduleAfterRemoval = MAPPER.readValue(file, Map.class);
         assertTrue(scheduleAfterRemoval.size() == origSize);
         assertFalse(scheduleAfterRemoval.containsKey("Amogus"));
+    }
+
+    @Test
+    public void getPatientAtSlotByDocId_emptySlot_returnsNull() throws Exception {
+        LocalDate futureDate = LocalDate.now().plusDays(1);
+        writeScheduleFile(createDoctor(1, "John Tan"), futureDate, null);
+
+        assertNull(ScheduleManager.getPatientAtSlotByDocId(1, futureDate.toString(), "09:00"));
+    }
+
+    @Test
+    public void getPatientAtSlotByDocId_validSlot_returnsPatient() throws Exception {
+        LocalDate futureDate = LocalDate.now().plusDays(1);
+        writeScheduleFile(createDoctor(1, "John Tan"), futureDate, "Alice Lim");
+
+        String patient = ScheduleManager.getPatientAtSlotByDocId(1, futureDate.toString(), "09:00");
+        assertEquals("Alice Lim", patient);
+    }
+
+    @Test
+    public void getPatientAtSlotByDocId_noFile_returnsNull() throws Exception {
+        new File(SCHEDULE_FILE_PATH).delete();
+        assertNull(ScheduleManager.getPatientAtSlotByDocId(1, LocalDate.now().plusDays(1).toString(), "09:00"));
+    }
+
+
+    @Test
+    public void getPatientAtSlotByDocId_noDate_returnsNull() throws Exception {
+        LocalDate futureDate = LocalDate.now().plusDays(1);
+        writeScheduleFile(createDoctor(1, "John Tan"), futureDate, "Alice Lim");
+
+        assertNull(ScheduleManager.getPatientAtSlotByDocId(1, futureDate.plusDays(5).toString(), "09:00"));
+    }
+
+    @Test
+    public void getScheduleByDocId_noDate_throwsIllegalArgument() throws Exception {
+        LocalDate futureDate = LocalDate.now().plusDays(1);
+        writeScheduleFile(createDoctor(1, "John Tan"), futureDate, null);
+
+        assertThrows(IllegalArgumentException.class, ()
+                -> ScheduleManager.getScheduleByDocId(1, futureDate.plusDays(5).toString()));
+    }
+
+    @Test
+    public void getPatientAtSlotByDocId_noDoctor_returnsNull() throws Exception {
+        LocalDate futureDate = LocalDate.now().plusDays(1);
+        writeScheduleFile(createDoctor(1, "John Tan"), futureDate, "Alice Lim");
+
+        assertNull(ScheduleManager.getPatientAtSlotByDocId(99, futureDate.toString(), "09:00"));
+    }
+
+    @Test
+    public void getScheduleIgnoreCase_noDate_throwsIllegalArgument() throws Exception {
+        LocalDate futureDate = LocalDate.now().plusDays(1);
+        writeScheduleFile(createDoctor(1, "John Tan"), futureDate, null);
+
+        assertThrows(IllegalArgumentException.class, ()
+                -> ScheduleManager.getScheduleIgnoreCase("John Tan", futureDate.plusDays(5).toString()));
+    }
+
+    // added by copilot
+    @Test
+    public void addDoctorSchedule_noExistingFile_createsFileAndSchedule() throws Exception {
+        new File(SCHEDULE_FILE_PATH).delete();
+        Doctor doctor = new DoctorBuilder().withName("Dr John New").withDocId(10).build();
+
+        ScheduleManager.addDoctorSchedule(doctor);
+
+        File file = new File(SCHEDULE_FILE_PATH);
+        assertTrue(file.exists());
+        @SuppressWarnings("unchecked")
+        Map<String, Object> data = MAPPER.readValue(file, Map.class);
+        assertTrue(data.containsKey("doc_10"));
+    }
+
+    // added by copilot
+    @Test
+    public void addDoctorSchedule_existingDoctor_updatesMetadata() throws Exception {
+        Doctor doctor = new DoctorBuilder().withName("Old Name").withDocId(5).build();
+        ScheduleManager.addDoctorSchedule(doctor);
+
+        Doctor updated = new DoctorBuilder().withName("New Name").withDocId(5).build();
+        ScheduleManager.addDoctorSchedule(updated);
+
+        File file = new File(SCHEDULE_FILE_PATH);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> data = MAPPER.readValue(file, Map.class);
+        assertTrue(data.containsKey("doc_5"));
+        @SuppressWarnings("unchecked")
+        Map<String, Object> docSchedule = (Map<String, Object>) data.get("doc_5");
+        assertEquals("New Name", docSchedule.get("doctorName"));
+    }
+
+    // added by copilot
+    @Test
+    public void findDoctorKeyByDocId_docIdStoredAsString_findsDoctor() throws Exception {
+        LocalDate today = LocalDate.now();
+        File file = new File(SCHEDULE_FILE_PATH);
+        file.getParentFile().mkdirs();
+
+        Map<String, Object> doctorSchedule = new LinkedHashMap<>();
+        doctorSchedule.put("docId", "7");
+        doctorSchedule.put("doctorName", "Dr String");
+        Map<String, String> slots = new LinkedHashMap<>();
+        slots.put("09:00", null);
+        doctorSchedule.put(today.toString(), slots);
+
+        Map<String, Object> root = new LinkedHashMap<>();
+        root.put("__lastUpdated", today.toString());
+        root.put("legacy_key", doctorSchedule);
+        MAPPER.writerWithDefaultPrettyPrinter().writeValue(file, root);
+
+        Map<String, String> schedule = ScheduleManager.getScheduleByDocId(7, today.toString());
+        assertNotNull(schedule);
+        assertTrue(schedule.containsKey("09:00"));
+    }
+
+    // added by copilot
+    @Test
+    public void findDoctorKeyByDocId_malformedStringId_skipsEntry() throws Exception {
+        LocalDate today = LocalDate.now();
+        File file = new File(SCHEDULE_FILE_PATH);
+        file.getParentFile().mkdirs();
+
+        Map<String, Object> doctorSchedule = new LinkedHashMap<>();
+        doctorSchedule.put("docId", "not_a_number");
+        doctorSchedule.put("doctorName", "Dr Malformed");
+        Map<String, String> slots = new LinkedHashMap<>();
+        slots.put("09:00", null);
+        doctorSchedule.put(today.toString(), slots);
+
+        Map<String, Object> root = new LinkedHashMap<>();
+        root.put("__lastUpdated", today.toString());
+        root.put("bad_key", doctorSchedule);
+        MAPPER.writerWithDefaultPrettyPrinter().writeValue(file, root);
+
+        assertNull(ScheduleManager.getScheduleByDocId(1, today.toString()));
+    }
+
+    // added by copilot
+    @Test
+    public void findDoctorKey_legacyKeyAsName_findsDoctor() throws Exception {
+        LocalDate today = LocalDate.now();
+        File file = new File(SCHEDULE_FILE_PATH);
+        file.getParentFile().mkdirs();
+
+        Map<String, Object> doctorSchedule = new LinkedHashMap<>();
+        doctorSchedule.put("docId", 1);
+        doctorSchedule.put("doctorName", "Dr Legacy");
+        Map<String, String> slots = new LinkedHashMap<>();
+        slots.put("09:00", "Alice");
+        doctorSchedule.put(today.toString(), slots);
+
+        Map<String, Object> root = new LinkedHashMap<>();
+        root.put("__lastUpdated", today.toString());
+        root.put("Dr Legacy", doctorSchedule);
+        MAPPER.writerWithDefaultPrettyPrinter().writeValue(file, root);
+
+        Map<String, String> schedule = ScheduleManager.getScheduleIgnoreCase("dr legacy", today.toString());
+        assertNotNull(schedule);
+        assertEquals("Alice", schedule.get("09:00"));
+    }
+
+    @Test
+    public void findDoctorKey_nonExistentName_returnsNull() throws Exception {
+        LocalDate today = LocalDate.now();
+        writeScheduleFile(createDoctor(1, "John Tan"), today, null);
+
+        assertNull(ScheduleManager.getScheduleIgnoreCase("John Cena", today.toString()));
+    }
+
+    // added by copilot
+    @Test
+    public void getScheduleByDocId_corruptedFile_returnsNull() throws Exception {
+        File file = new File(SCHEDULE_FILE_PATH);
+        file.getParentFile().mkdirs();
+        Files.writeString(file.toPath(), "not valid json at all");
+
+        assertNull(ScheduleManager.getScheduleByDocId(1, LocalDate.now().toString()));
+    }
+
+    @Test
+    public void addAppt_duplicateAppointmentSamePatient_throwsException() throws Exception {
+        //written by copilot
+        LocalDate today = LocalDate.now().plusDays(1);
+        writeScheduleFile(createDoctor(1, "John Tan"), today, null);
+
+        Appointment appt = new Appointment(1, "John Tan", 2, "Jane Lim", today.toString(), "09:00", -1);
+        ScheduleManager.addAppt(appt);
+
+        Appointment duplicateAppt = new Appointment(1, "John Tan", 2, "Jane Lim", today.toString(), "09:00", -1);
+        IOException thrown = assertThrows(IOException.class, () -> ScheduleManager.addAppt(duplicateAppt));
+        assertEquals("This appointment already exists", thrown.getMessage());
+    }
+
+    @Test
+    public void addAppt_differentPatientSameSlot_throws() throws Exception {
+        //written by copilot
+        LocalDate today = LocalDate.now().plusDays(1);
+        writeScheduleFile(createDoctor(1, "John Tan"), today, null);
+
+        Appointment appt1 = new Appointment(1, "John Tan", 2, "Jane Lim", today.toString(), "09:00", -1);
+        ScheduleManager.addAppt(appt1);
+
+        Appointment appt2 = new Appointment(1, "John Tan", 3, "Bob Smith", today.toString(), "09:00", -1);
+        IOException thrown = assertThrows(IOException.class, () -> ScheduleManager.addAppt(appt2));
+        assertTrue(thrown.getMessage().contains("already booked"));
+    }
+
+    @Test
+    public void getPatientAtSlotByDocId_afterAddingAppointment_returnsCorrectPatient() throws Exception {
+        //written by copilot
+        LocalDate today = LocalDate.now().plusDays(1);
+        writeScheduleFile(createDoctor(1, "John Tan"), today, null);
+
+        Appointment appt = new Appointment(1, "John Tan", 2, "Jane Lim", today.toString(), "09:00", -1);
+        ScheduleManager.addAppt(appt);
+
+        String patient = ScheduleManager.getPatientAtSlotByDocId(1, today.toString(), "09:00");
+        assertEquals("Jane Lim", patient);
+    }
+
+    @Test
+    public void getScheduleByDocId_afterAddingMultipleAppointments_maintainsConsistency() throws Exception {
+        //written by copilot
+        LocalDate today = LocalDate.now().plusDays(1);
+        writeScheduleFile(createDoctor(1, "John Tan"), today, null);
+
+        Appointment appt1 = new Appointment(1, "John Tan", 2, "Jane Lim", today.toString(), "09:00", -1);
+        ScheduleManager.addAppt(appt1);
+        Appointment appt2 = new Appointment(1, "John Tan", 3, "Bob Smith", today.toString(), "09:30", -1);
+        ScheduleManager.addAppt(appt2);
+
+        Map<String, String> schedule = ScheduleManager.getScheduleByDocId(1, today.toString());
+        assertEquals("Jane Lim", schedule.get("09:00"));
+        assertEquals("Bob Smith", schedule.get("09:30"));
     }
 
     private void writeScheduleFile(Doctor doctor, LocalDate date, String bookedPatient) throws Exception {

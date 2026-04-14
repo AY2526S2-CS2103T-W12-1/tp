@@ -1,7 +1,9 @@
 package seedu.address.logic.commands;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.testutil.Assert.assertThrows;
 
 import java.io.File;
@@ -24,6 +26,7 @@ import seedu.address.model.appointment.Appointment;
 import seedu.address.model.person.Doctor;
 import seedu.address.model.person.Patient;
 import seedu.address.storage.AppointmentManager;
+import seedu.address.storage.ScheduleManager;
 import seedu.address.testutil.DoctorBuilder;
 import seedu.address.testutil.PatientBuilder;
 
@@ -86,7 +89,7 @@ public class AddApptCommandTest {
         model.addDoctor(doctor);
         model.addPatient(patient);
 
-        Appointment appt = new Appointment(DOCTOR_ID, PATIENT_ID, date.format(DATE_FORMAT), "09:30");
+        Appointment appt = new Appointment(DOCTOR_ID, PATIENT_ID, date.format(DATE_FORMAT), "10:00");
         AddApptCommand command = new AddApptCommand(appt);
 
         CommandResult result = command.execute(model);
@@ -129,7 +132,7 @@ public class AddApptCommandTest {
         model.addDoctor(doctor);
         model.addPatient(patient);
 
-        Appointment appt = new Appointment(DOCTOR_ID, PATIENT_ID, "2026-13-01", "09:30");
+        Appointment appt = new Appointment(DOCTOR_ID, PATIENT_ID, "2026-13-01", "10:00");
         AddApptCommand command = new AddApptCommand(appt);
 
         assertThrows(CommandException.class, () -> command.execute(model));
@@ -163,6 +166,108 @@ public class AddApptCommandTest {
         AddApptCommand command = new AddApptCommand(appt);
 
         assertThrows(Exception.class, () -> command.execute(model));
+    }
+
+    @Test
+    public void equals_sameObject_returnsTrue() {
+        Appointment appt = new Appointment(DOCTOR_ID, PATIENT_ID, "2026-05-01", "09:00");
+        AddApptCommand command = new AddApptCommand(appt);
+        assertTrue(command.equals(command));
+    }
+
+    @Test
+    public void equals_sameValues_returnsTrue() {
+        Appointment appt1 = new Appointment(DOCTOR_ID, PATIENT_ID, "2026-05-01", "09:00");
+        Appointment appt2 = new Appointment(DOCTOR_ID, PATIENT_ID, "2026-05-01", "09:00");
+        AddApptCommand command1 = new AddApptCommand(appt1);
+        AddApptCommand command2 = new AddApptCommand(appt2);
+        assertTrue(command1.equals(command2));
+    }
+
+    @Test
+    public void equals_differentType_returnsFalse() {
+        Appointment appt = new Appointment(DOCTOR_ID, PATIENT_ID, "2026-05-01", "09:00");
+        AddApptCommand command = new AddApptCommand(appt);
+        assertFalse(command.equals("string"));
+    }
+
+    @Test
+    public void equals_differentValues_returnsFalse() {
+        Appointment appt1 = new Appointment(DOCTOR_ID, PATIENT_ID, "2026-05-01", "09:00");
+        Appointment appt2 = new Appointment(DOCTOR_ID, PATIENT_ID, "2026-05-01", "10:00");
+        AddApptCommand command1 = new AddApptCommand(appt1);
+        AddApptCommand command2 = new AddApptCommand(appt2);
+        assertFalse(command1.equals(command2));
+    }
+
+    @Test
+    public void toStringMethod() {
+        Appointment appt = new Appointment(DOCTOR_ID, PATIENT_ID, "2026-05-01", "09:00");
+        AddApptCommand command = new AddApptCommand(appt);
+        String result = command.toString();
+        assertTrue(result.contains("toAdd"));
+    }
+
+    @Test
+    public void execute_apptManagerFails_rollbackAndThrows() throws Exception {
+        Model model = new ModelManager();
+        Doctor doctor = new DoctorBuilder().withName(DOCTOR_NAME).withDocId(DOCTOR_ID).build();
+        Patient patient = new PatientBuilder().withName(PATIENT_NAME).withPatId(PATIENT_ID).build();
+        model.addDoctor(doctor);
+        model.addPatient(patient);
+
+        Appointment appt = new Appointment(DOCTOR_ID, PATIENT_ID, date.format(DATE_FORMAT), "09:00");
+        AddApptCommand command = new AddApptCommand(appt);
+
+        // Corrupt appointments file so AppointmentManager.addAppointment fails with IOException
+        File apptFile = new File(APPT_FILE_PATH);
+        Files.write(apptFile.toPath(), "CORRUPT".getBytes());
+
+        assertThrows(CommandException.class, () -> command.execute(model));
+    }
+
+    @Test
+    public void execute_patientMultipleDoctorsSameSlot_throws() throws Exception {
+        //written by copilot
+        Model model = new ModelManager();
+        Doctor doctor1 = new DoctorBuilder().withName("Doctor One").withDocId(DOCTOR_ID).build();
+        Doctor doctor2 = new DoctorBuilder().withName("Doctor Two").withDocId(2)
+                .withPhone("99999999").withEmail("doctortwo@example.com").build();
+        Patient patient = new PatientBuilder().withName(PATIENT_NAME).withPatId(PATIENT_ID).build();
+        model.addDoctor(doctor1);
+        model.addDoctor(doctor2);
+        model.addPatient(patient);
+
+        ScheduleManager.addDoctorSchedule(doctor1);
+        ScheduleManager.addDoctorSchedule(doctor2);
+
+        Appointment appt1 = new Appointment(DOCTOR_ID, PATIENT_ID, date.format(DATE_FORMAT), "10:00");
+        AddApptCommand command1 = new AddApptCommand(appt1);
+        command1.execute(model);
+
+        Appointment appt2 = new Appointment(2, PATIENT_ID, date.format(DATE_FORMAT), "10:00");
+        AddApptCommand command2 = new AddApptCommand(appt2);
+
+        assertThrows(CommandException.class, () -> command2.execute(model));
+    }
+
+    @Test
+    public void execute_duplicateAppointment_throws() throws Exception {
+        //written by copilot
+        Model model = new ModelManager();
+        Doctor doctor = new DoctorBuilder().withName(DOCTOR_NAME).withDocId(DOCTOR_ID).build();
+        Patient patient = new PatientBuilder().withName(PATIENT_NAME).withPatId(PATIENT_ID).build();
+        model.addDoctor(doctor);
+        model.addPatient(patient);
+
+        Appointment appt = new Appointment(DOCTOR_ID, PATIENT_ID, date.format(DATE_FORMAT), "10:00");
+        AddApptCommand command1 = new AddApptCommand(appt);
+        command1.execute(model);
+
+        Appointment appt2 = new Appointment(DOCTOR_ID, PATIENT_ID, date.format(DATE_FORMAT), "10:00");
+        AddApptCommand command2 = new AddApptCommand(appt2);
+
+        assertThrows(CommandException.class, () -> command2.execute(model));
     }
 
     private void writeScheduleWithSlots(int doctorId, String doctorName, String dateValue, Map<String, String> slots)

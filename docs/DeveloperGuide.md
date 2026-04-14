@@ -12,7 +12,7 @@
 --------------------------------------------------------------------------------------------------------------------
 
 ## **Acknowledgements**
-* GitHub Copilot has been used to assist code writing, particularly in helping get unstuck and improving the User Guide's UI.
+* GitHub Copilot and Codex have been used by the team to assist code writing, particularly in helping get unstuck, improving the User Guide's UI, and updating some sections of the Developer Guide.
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ Given below is a quick overview of main components and how they interact with ea
 
 **Main components of the architecture**
 
-**`Main`** (consisting of classes [`Main`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/Main.java) and [`MainApp`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/MainApp.java)) is in charge of the app launch and shut down.
+**`Main`** (consisting of classes [`Main`](https://github.com/AY2526S2-CS2103T-W12-1/tp/tree/master/src/main/java/seedu/address/Main.java) and [`MainApp`](https://github.com/AY2526S2-CS2103T-W12-1/tp/tree/master/src/main/java/seedu/address/MainApp.java)) is in charge of the app launch and shut down.
 * At app launch, it initializes the other components in the correct sequence, and connects them up with each other.
 * At shut down, it shuts down the other components and invokes cleanup methods where necessary.
 
@@ -56,9 +56,9 @@ The *Sequence Diagram* below shows how the components interact with each other f
 Each of the four main components (also shown in the diagram above),
 
 * defines its *API* in an `interface` with the same name as the Component.
-* implements its functionality using a concrete `{Component Name}Manager` class (which follows the corresponding API `interface` mentioned in the previous point.
+* implements its functionality using a concrete `{Component Name}Manager` class (which follows the corresponding API `interface` mentioned in the previous point).
 
-For example, the `Logic` component defines its API in the `Logic.java` interface and implements its functionality using the `LogicManager.java` class which follows the `Logic` interface. Other components interact with a given component through its interface rather than the concrete class (reason: to prevent outside component's being coupled to the implementation of a component), as illustrated in the (partial) class diagram below.
+For example, the `Logic` component defines its API in the `Logic.java` interface and implements its functionality using the `LogicManager.java` class which follows the `Logic` interface. Other components interact with a given component through its interface rather than the concrete class (reason: to prevent outside components from being coupled to a component's implementation), as illustrated in the (partial) class diagram below.
 
 <puml src="diagrams/ComponentManagers.puml" width="300" />
 
@@ -66,14 +66,14 @@ The sections below give more details of each component.
 
 ### UI component
 
-The **API** of this component is specified in [`Ui.java`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/ui/Ui.java)
+The **API** of this component is specified in [`Ui.java`](https://github.com/AY2526S2-CS2103T-W12-1/tp/tree/master/src/main/java/seedu/address/ui/Ui.java)
 
 <puml src="diagrams/UiClassDiagram.puml" alt="Structure of the UI Component"/>
 
 The UI consists of a `MainWindow` that is made up of parts e.g. `CommandBox`, `ResultDisplay`, `PersonListPanel`, `StatusBarFooter` etc. All these, including the `MainWindow`, inherit from the abstract `UiPart` class which captures the commonalities between classes that represent parts of the visible GUI.
 
 
-The `UI` component uses the JavaFx UI framework. The layout of these UI parts are defined in matching `.fxml` files that are in the `src/main/resources/view` folder. For example, the layout of the [`MainWindow`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/ui/MainWindow.java) is specified in [`MainWindow.fxml`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/resources/view/MainWindow.fxml)
+The `UI` component uses the JavaFX UI framework. The layout of these UI parts are defined in matching `.fxml` files that are in the `src/main/resources/view` folder. For example, the layout of the [`MainWindow`](https://github.com/AY2526S2-CS2103T-W12-1/tp/tree/master/src/main/java/seedu/address/ui/MainWindow.java) is specified in [`MainWindow.fxml`](https://github.com/AY2526S2-CS2103T-W12-1/tp/tree/master/src/main/resources/view/MainWindow.fxml)
 
 The `UI` component,
 
@@ -84,25 +84,25 @@ The `UI` component,
 
 ### Logic component
 
-**API** : [`Logic.java`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/logic/Logic.java)
+**API** : [`Logic.java`](https://github.com/AY2526S2-CS2103T-W12-1/tp/tree/master/src/main/java/seedu/address/logic/Logic.java)
 
 Here's a (partial) class diagram of the `Logic` component:
 
 <puml src="diagrams/LogicClassDiagram.puml" width="550"/>
 
-The sequence diagram below illustrates the interactions within the `Logic` component, taking `execute("delete 1")` API call as an example.
+The sequence diagram below illustrates the interactions within the `Logic` component, taking `execute("delpat 1")` API call as an example.
 
-<puml src="diagrams/DeleteSequenceDiagram.puml" alt="Interactions Inside the Logic Component for the `delete 1` Command" />
+<puml src="diagrams/DeletePatientSequenceDiagram.puml" alt="Interactions Inside the Logic Component for the `delpat 1` Command" />
 
 <box type="info" seamless>
 
-**Note:** The lifeline for `DeleteCommandParser` should end at the destroy marker (X) but due to a limitation of PlantUML, the lifeline continues till the end of diagram.
+**Note:** The lifeline for `DeletePatCommandParser` should end at the destroy marker (X) but due to a limitation of PlantUML, the lifeline continues till the end of diagram.
 </box>
 
 How the `Logic` component works:
 
-1. When `Logic` is called upon to execute a command, it is passed to an `AddressBookParser` object which in turn creates a parser that matches the command (e.g., `DeleteCommandParser`) and uses it to parse the command.
-1. This results in a `Command` object (more precisely, an object of one of its subclasses e.g., `DeleteCommand`) which is executed by the `LogicManager`.
+1. When `Logic` is called upon to execute a command, it is passed to an `AddressBookParser` object which in turn creates a parser that matches the command (e.g., `DeletePatCommandParser`) and uses it to parse the command.
+1. This results in a `Command` object (more precisely, an object of one of its subclasses e.g., `DeletePatCommand`) which is executed by the `LogicManager`.
 1. The command can communicate with the `Model` when it is executed (e.g. to delete a person).<br>
    Note that although this is shown as a single step in the diagram above (for simplicity), in the code it can take several interactions (between the command object and the `Model`) to achieve.
 1. The result of the command execution is encapsulated as a `CommandResult` object which is returned back from `Logic`.
@@ -116,7 +116,7 @@ How the parsing works:
 * All `XYZCommandParser` classes (e.g., `AddCommandParser`, `DeleteCommandParser`, ...) inherit from the `Parser` interface so that they can be treated similarly where possible e.g, during testing.
 
 ### Model component
-**API** : [`Model.java`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/model/Model.java)
+**API** : [`Model.java`](https://github.com/AY2526S2-CS2103T-W12-1/tp/tree/master/src/main/java/seedu/address/model/Model.java)
 
 <puml src="diagrams/ModelClassDiagram.puml" width="450" />
 
@@ -125,20 +125,20 @@ The `Model` component,
 
 * stores the address book data i.e., all `Person` objects (which are contained in a `UniquePersonList` object).
 * stores the currently 'selected' `Person` objects (e.g., results of a search query) as a separate _filtered_ list which is exposed to outsiders as an unmodifiable `ObservableList<Person>` that can be 'observed' e.g. the UI can be bound to this list so that the UI automatically updates when the data in the list change.
-* stores a `UserPref` object that represents the user’s preferences. This is exposed to the outside as a `ReadOnlyUserPref` objects.
+* stores a `UserPrefs` object that represents the user’s preferences. This is exposed to the outside as a `ReadOnlyUserPrefs` object.
 * does not depend on any of the other three components (as the `Model` represents data entities of the domain, they should make sense on their own without depending on other components)
 
 
 ### Storage component
 
-**API** : [`Storage.java`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/storage/Storage.java)
+**API** : [`Storage.java`](https://github.com/AY2526S2-CS2103T-W12-1/tp/tree/master/src/main/java/seedu/address/storage/Storage.java)
 
 <puml src="diagrams/StorageClassDiagram.puml" width="550" />
 
 The `Storage` component,
 * can save both address book data and user preference data in JSON format, and read them back into corresponding objects.
-* inherits from both `AddressBookStorage` and `UserPrefStorage`, which means it can be treated as either one (if only the functionality of only one is needed).
-* depends on some classes in the `Model` component (because the `Storage` component's job is to save/retrieve objects that belong to the `Model`)
+* inherits from both `AddressBookStorage` and `UserPrefsStorage`, which means it can be treated as either one (if only the functionality of only one is needed).
+* depends on some classes in the `Model` component (because the `Storage` component's job is to save and retrieve objects that belong to the `Model`).
 
 ### Common classes
 
@@ -146,107 +146,142 @@ Classes used by multiple components are in the `seedu.address.commons` package.
 
 --------------------------------------------------------------------------------------------------------------------
 
-## **Implementation**
+## **Planned Enhancements**
 
-This section describes some noteworthy details on how certain features are implemented.
+This section describes some noteworthy details on how certain features are to be implemented. These are in planning.
 
-### \[Proposed\] Undo/redo feature
+### \[Planned\] Command History Retention
 
-#### Proposed Implementation
+#### Enhancement
 
-The proposed undo/redo mechanism is facilitated by `VersionedAddressBook`. It extends `AddressBook` with an undo/redo history, stored internally as an `addressBookStateList` and `currentStatePointer`. Additionally, it implements the following operations:
+The proposed command history retention feature allows users to navigate through previously executed commands using arrow keys, similar to how a standard CLI (Command Line Interface) works. This feature is facilitated by a `CommandHistory` component that maintains a chronological record of all executed commands.
 
-* `VersionedAddressBook#commit()` — Saves the current address book state in its history.
-* `VersionedAddressBook#undo()` — Restores the previous address book state from its history.
-* `VersionedAddressBook#redo()` — Restores a previously undone address book state from its history.
+The `CommandHistory` component will implement the following operations:
 
-These operations are exposed in the `Model` interface as `Model#commitAddressBook()`, `Model#undoAddressBook()` and `Model#redoAddressBook()` respectively.
+* `CommandHistory#addCommand(String command)` — Records a new command in the history.
+* `CommandHistory#getPreviousCommand()` — Retrieves the previous command in the history.
+* `CommandHistory#getNextCommand()` — Retrieves the next command in the history.
+* `CommandHistory#getCurrentIndex()` — Returns the current position in the history.
 
-Given below is an example usage scenario and how the undo/redo mechanism behaves at each step.
+These operations will be exposed in the `UI` component's `CommandBox` class, which handles user input and key event processing. When a user presses the **Up Arrow** key, the system will retrieve the previous command from history and populate it in the command input field. Pressing the **Down Arrow** key will retrieve the next command.
 
-Step 1. The user launches the application for the first time. The `VersionedAddressBook` will be initialized with the initial address book state, and the `currentStatePointer` pointing to that single address book state.
+#### Usage Scenario
 
-<puml src="diagrams/UndoRedoState0.puml" alt="UndoRedoState0" />
+Step 1. The user launches the application. The `CommandHistory` is initialized as empty.
 
-Step 2. The user executes `delete 5` command to delete the 5th person in the address book. The `delete` command calls `Model#commitAddressBook()`, causing the modified state of the address book after the `delete 5` command executes to be saved in the `addressBookStateList`, and the `currentStatePointer` is shifted to the newly inserted address book state.
+Step 2. The user executes the command `addpat n/John Doe p/81234567 e/john@example.com a/123 Main St`. This command is recorded in the command history.
 
-<puml src="diagrams/UndoRedoState1.puml" alt="UndoRedoState1" />
+Step 3. The user executes the command `viewsched d/John Smith id/1`. This command is also recorded in the history.
 
-Step 3. The user executes `add n/David …​` to add a new person. The `add` command also calls `Model#commitAddressBook()`, causing another modified address book state to be saved into the `addressBookStateList`.
+Step 4. The user presses the **Up Arrow** key while the command box is focused. The previous command `viewsched d/John Smith id/1` is retrieved from history and displayed in the command box.
 
-<puml src="diagrams/UndoRedoState2.puml" alt="UndoRedoState2" />
+Step 5. The user presses the **Up Arrow** key again. The command `addpat n/John Doe p/81234567 e/john@example.com a/123 Main St` is now displayed, moving further back in history.
 
-<box type="info" seamless>
+Step 6. The user presses the **Down Arrow** key. The command `viewsched d/John Smith id/1` is displayed again, moving forward in the command history.
 
-**Note:** If a command fails its execution, it will not call `Model#commitAddressBook()`, so the address book state will not be saved into the `addressBookStateList`.
+Step 7. When the user presses the **Down Arrow** key and reaches the most recent command, subsequent presses will clear the command box, allowing the user to type a new command.
 
-</box>
+#### Design Considerations
 
-Step 4. The user now decides that adding the person was a mistake, and decides to undo that action by executing the `undo` command. The `undo` command will call `Model#undoAddressBook()`, which will shift the `currentStatePointer` once to the left, pointing it to the previous address book state, and restores the address book to that state.
+**Aspect: Storage of command history:**
 
-<puml src="diagrams/UndoRedoState3.puml" alt="UndoRedoState3" />
+* **Alternative 1 (current choice):** Store command history in-memory during the application session.
+  * Pros: Simple to implement, fast access, no disk I/O overhead.
+  * Cons: Command history is lost when the application is closed.
 
+* **Alternative 2:** Persist command history to disk (e.g., in a history file).
+  * Pros: Command history is retained across sessions, allowing users to access commands from previous runs.
+  * Cons: Requires file I/O, adds complexity, potential privacy concerns if sensitive commands are stored.
 
-<box type="info" seamless>
+**Aspect: Handling of failed commands:**
 
-**Note:** If the `currentStatePointer` is at index 0, pointing to the initial AddressBook state, then there are no previous AddressBook states to restore. The `undo` command uses `Model#canUndoAddressBook()` to check if this is the case. If so, it will return an error to the user rather
-than attempting to perform the undo.
+* **Alternative 1:** Record all commands in history, regardless of success or failure.
+  * Pros: Users can recall and re-execute failed commands with modifications.
+  * Cons: History may become cluttered with erroneous commands.
 
-</box>
+* **Alternative 2 (current choice):** Record only successfully executed commands.
+  * Pros: Keeps history clean and focused on valid operations.
+  * Cons: Users cannot quickly recall the exact syntax of a failed command.
 
-The following sequence diagram shows how an undo operation goes through the `Logic` component:
+**Aspect: History size limit:**
 
-<puml src="diagrams/UndoSequenceDiagram-Logic.puml" alt="UndoSequenceDiagram-Logic" />
+* **Alternative 1:** No limit on command history size.
+  * Pros: Users can access all historical commands from the session.
+  * Cons: May consume significant memory for long sessions.
 
-<box type="info" seamless>
-
-**Note:** The lifeline for `UndoCommand` should end at the destroy marker (X) but due to a limitation of PlantUML, the lifeline reaches the end of diagram.
-
-</box>
-
-Similarly, how an undo operation goes through the `Model` component is shown below:
-
-<puml src="diagrams/UndoSequenceDiagram-Model.puml" alt="UndoSequenceDiagram-Model" />
-
-The `redo` command does the opposite — it calls `Model#redoAddressBook()`, which shifts the `currentStatePointer` once to the right, pointing to the previously undone state, and restores the address book to that state.
-
-<box type="info" seamless>
-
-**Note:** If the `currentStatePointer` is at index `addressBookStateList.size() - 1`, pointing to the latest address book state, then there are no undone AddressBook states to restore. The `redo` command uses `Model#canRedoAddressBook()` to check if this is the case. If so, it will return an error to the user rather than attempting to perform the redo.
-
-</box>
-
-Step 5. The user then decides to execute the command `list`. Commands that do not modify the address book, such as `list`, will usually not call `Model#commitAddressBook()`, `Model#undoAddressBook()` or `Model#redoAddressBook()`. Thus, the `addressBookStateList` remains unchanged.
-
-<puml src="diagrams/UndoRedoState4.puml" alt="UndoRedoState4" />
-
-Step 6. The user executes `clear`, which calls `Model#commitAddressBook()`. Since the `currentStatePointer` is not pointing at the end of the `addressBookStateList`, all address book states after the `currentStatePointer` will be purged. Reason: It no longer makes sense to redo the `add n/David …​` command. This is the behavior that most modern desktop applications follow.
-
-<puml src="diagrams/UndoRedoState5.puml" alt="UndoRedoState5" />
-
-The following activity diagram summarizes what happens when a user executes a new command:
-
-<puml src="diagrams/CommitActivityDiagram.puml" width="250" />
-
-#### Design considerations:
-
-**Aspect: How undo & redo executes:**
-
-* **Alternative 1 (current choice):** Saves the entire address book.
-  * Pros: Easy to implement.
-  * Cons: May have performance issues in terms of memory usage.
-
-* **Alternative 2:** Individual command knows how to undo/redo by
-  itself.
-  * Pros: Will use less memory (e.g. for `delete`, just save the person being deleted).
-  * Cons: We must ensure that the implementation of each individual command are correct.
+* **Alternative 2 (current choice):** Implement a configurable limit (e.g., last 100 commands).
+  * Pros: Bounded memory usage, maintains reasonable history depth.
+  * Cons: Older commands will be discarded once the limit is reached.
 
 _{more aspects and alternatives to be added}_
 
-### \[Proposed\] Data archiving
+--------------------------------------------------------------------------------------------------------------------
 
-_{Explain here how the data archiving feature will be implemented}_
+### \[Planned\] Patient Appointment Viewing
 
+#### Enhancement
+
+The proposed patient appointment viewing feature allows receptionists to view a patient's upcoming appointments directly, complementing the existing doctor schedule viewing functionality. This addresses the need for quick access to patient-specific appointment information during clinic operations, such as when patients call to confirm or reschedule their appointments.
+
+This feature will introduce a new command, such as `viewpatappt`, that takes a patient identifier (name or ID) and optionally a date range, displaying all future appointments for that patient, including doctor details, appointment times, and appointment IDs.
+
+#### Usage Scenario
+
+Step 1. A patient calls the clinic and cannot remember their next appointment details.
+
+Step 2. The receptionist enters the command `viewpatappt n/John Doe` to view John's upcoming appointments.
+
+Step 3. The system validates the patient name and retrieves their appointments.
+
+Step 4. The system displays a list of John's future appointments, showing dates, times, assigned doctors, and appointment IDs.
+
+Step 5. The receptionist informs the patient of their next appointment and can proceed to book, edit, or cancel appointments as needed.
+
+   Use case ends.
+
+**Extensions**
+
+* 3a. The patient name does not match any existing patient.
+  * 3a1. System shows: `Patient not found.`
+
+    Use case resumes at step 2.
+
+* 3b. The patient has no upcoming appointments.
+  * 3b1. System shows: `No upcoming appointments found for this patient.`
+
+    Use case ends.
+
+#### Design Considerations
+
+**Aspect: Patient identification method:**
+
+* **Alternative 1:** Use patient name (e.g., `viewpatappt n/John Doe`).
+  * Pros: Intuitive and easy to remember, aligns with existing command patterns.
+  * Cons: Potential ambiguity if multiple patients share similar names.
+
+* **Alternative 2 (current choice):** Use patient ID (e.g., `viewpatappt id/1`).
+  * Pros: Unique identification, eliminates name conflicts, consistent with appointment management commands.
+  * Cons: Requires receptionist to know or quickly look up patient ID.
+
+**Aspect: Date range and filtering:**
+
+* **Alternative 1:** Show all future appointments without limit.
+  * Pros: Provides complete appointment history and future schedule.
+  * Cons: May overwhelm users with extensive appointment lists, especially for long-term patients.
+
+* **Alternative 2 (current choice):** Limit to next 7-14 days by default, with optional date range parameters.
+  * Pros: Focuses on immediate and relevant appointments, reduces information overload, matches the 7-day limit in doctor schedule viewing.
+  * Cons: May miss important longer-term appointments.
+
+**Aspect: Display format and information:**
+
+* **Alternative 1:** Simple list format showing appointment details in chronological order.
+  * Pros: Consistent with existing list-based displays, easy to implement.
+  * Cons: May not provide clear overview for patients with multiple appointments.
+
+* **Alternative 2:** Grouped by date with doctor information highlighted.
+  * Pros: Better organization for multiple appointments, easier to scan for specific dates.
+  * Cons: More complex implementation, potential inconsistency with other views.
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -286,37 +321,37 @@ searching, scrolling, or clicking during live interactions.
 
 Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unlikely to have) - `*`
 
-| Priority | As a …​ | I want to …​ | So that I can…​ |
-|----------|----------|--------------|-----------------|
-| `* * *`  | new receptionist | see sample patient and practitioner data | understand what kind of information the system holds |
-| `* * *`  | receptionist starting real usage | remove any existing data | begin with a clean and accurate dataset |
-| `* * *`  | first-time user | understand what each field represents | avoid misusing or misunderstanding stored information |
-| `* * *`  | receptionist | add a new patient's contact details | quickly reference them in future interactions |
-| `* * *`  | receptionist | add a new doctor's contact details | track which doctors are available for appointments |
-| `* * *`  | receptionist | delete a patient who no longer visits the clinic | keep search results uncluttered |
-| `* * *`  | receptionist | delete a doctor from the system | remove practitioners who are no longer with the clinic |
-| `* * *`  | receptionist | view a practitioner's schedule for a specific day | answer availability questions quickly |
-| `* * *`  | receptionist | book an appointment slot for a patient with a doctor | confirm appointments during calls |
-| `* * *`  | receptionist | cancel an existing appointment | free up slots when patients reschedule or cancel |
-| `* *`    | receptionist | search for a patient using partial names | find them even if I don't remember exact details |
-| `* *`    | receptionist | search for a patient using a phone number | identify callers immediately |
-| `* *`    | receptionist | view a patient's contact details in one place | avoid asking the patient for information repeatedly |
-| `* *`    | receptionist | update a patient's contact information | keep records accurate |
-| `* *`    | receptionist | see which practitioners are currently on duty | avoid giving incorrect availability information to patients |
-| `* *`    | receptionist | quickly switch between different practitioners' schedules | compare availability during a call |
-| `* *`    | receptionist who types fast | perform common actions using the keyboard | avoid slowing down to use the mouse |
-| `* *`    | receptionist | correct mistakes quickly | ensure small typing errors don't disrupt my workflow |
-| `* *`    | long-time receptionist | clean up outdated entries | keep the system efficient over time |
-| `*`      | receptionist | check upcoming availability without leaving my current task | stay focused during calls |
-| `*`      | receptionist | return to my previous view quickly | avoid losing context during busy periods |
-| `*`      | receptionist returning after a break | quickly regain an overview of practitioners and patients | resume work smoothly |
-| `*`      | receptionist | rely on consistent data organisation | avoid relearning the system after time away |
+| Priority | As a …​ | I want to …​                                               | So that I can…​                                             |
+|----------|----------|------------------------------------------------------------|-------------------------------------------------------------|
+| `* * *`  | new receptionist | see sample patient and practitioner data                   | understand what kind of information the system holds        |
+| `* * *`  | receptionist starting real usage | remove any existing data                                   | begin with a clean and accurate dataset                     |
+| `* * *`  | first-time user | understand what each field represents                      | avoid misusing or misunderstanding stored information       |
+| `* * *`  | receptionist | add a new patient's contact details                        | quickly reference them in future interactions               |
+| `* * *`  | receptionist | add a new doctor's contact details                         | track which doctors are available for appointments          |
+| `* * *`  | receptionist | delete a patient who no longer visits the clinic           | keep search results uncluttered                             |
+| `* * *`  | receptionist | delete a doctor from the system                            | remove practitioners who are no longer with the clinic      |
+| `* * *`  | receptionist | view a practitioner's schedule for a specific day          | answer availability questions quickly                       |
+| `* * *`  | receptionist | book an appointment slot for a patient with a doctor       | confirm appointments during calls                           |
+| `* * *`  | receptionist | cancel an existing appointment                             | free up slots when patients reschedule or cancel            |
+| `* *`    | receptionist | search for a patient by name                               | look up their contact details                               |
+| `* *`    | receptionist | search for a patient using a phone number                  | identify callers immediately                                |
+| `* *`    | receptionist | view a patient's contact details in one place              | avoid asking the patient for information repeatedly         |
+| `* *`    | receptionist | update a patient's contact information                     | keep records accurate                                       |
+| `* *`    | receptionist | see which practitioners are currently on duty              | avoid giving incorrect availability information to patients |
+| `* *`    | receptionist | quickly switch between different practitioners' schedules  | compare availability during a call                          |
+| `* *`    | receptionist who types fast | perform common actions using the keyboard                  | avoid slowing down to use the mouse                         |
+| `* *`    | receptionist | correct mistakes quickly                                   | ensure small typing errors don't disrupt my workflow        |
+| `* *`    | long-time receptionist | clean up outdated entries                                  | keep the system efficient over time                         |
+| `*`      | receptionist | check upcoming availability without leaving my current task | stay focused during calls                                   |
+| `*`      | receptionist | return to my previous view quickly                         | avoid losing context during busy periods                    |
+| `*`      | receptionist returning after a break | quickly regain an overview of practitioners and patients   | resume work smoothly                                        |
+| `*`      | receptionist | rely on consistent data organisation                       | avoid relearning the system after time away                 |
 
 ---
 
 ### Use cases
 
-(For all use cases below, the **System** is the `ClinicBook` and the **Actor** is the `receptionist`, unless specified otherwise)
+(For all use cases below, the **System** is `CLInicDesk` and the **Actor** is the `receptionist`, unless specified otherwise)
 
 ---
 
@@ -324,7 +359,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 **MSS**
 
-1. Receptionist enters the add doctor command with name, phone, and email.
+1. Receptionist enters the add doctor command with name, phone, email, and address.
 2. System validates all fields.
 3. System adds the doctor and confirms with doctor details.
 
@@ -337,13 +372,13 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
     Use case resumes at step 1.
 
-* 2b. The phone number is not exactly 8 digits.
-  * 2b1. System shows: `Phone numbers should only contain numbers, and it should be 8 digits long`
+* 2b. The phone number contains non-numeric characters or is fewer than 3 digits.
+  * 2b1. System shows: `Phone numbers should only contain numbers, and it should be at least 3 digits long`
 
     Use case resumes at step 1.
 
 * 2c. The email is not in a valid format.
-  * 2c1. System shows: 
+  * 2c1. System shows:
   ```
     Emails should be of the format local-part@domain and adhere to the following constraints:
     1. The local-part should only contain alphanumeric characters and these special characters, excluding the parentheses, (+_.-). The local-part may not start or end with any special characters.
@@ -356,10 +391,111 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
     Use case resumes at step 1.
 
-* 2d. A doctor with the same name (case-insensitive) and email/phone already exists.
+* 2d. A doctor with the same phone number or the same email already exists.
   * 2d1. System shows: `A doctor with these contact details already exists in the app`
 
     Use case ends.
+
+---
+
+**Use case: Edit a doctor**
+
+**MSS**
+
+1. Receptionist views the list.
+2. System displays the list with indices.
+3. Receptionist enters the `editdoc` command with the target index and the fields to update (name, phone, email, and/or address).
+4. System validates all provided fields.
+5. System updates the doctor entry and confirms with the updated record's details.
+
+   Use case ends.
+
+**Extensions**
+
+* 2a. The list is empty.
+
+  Use case ends.
+
+* 3a. A name is entered instead of an index.
+    * 3a1. System shows:
+  ```
+  Invalid command format!
+  editdoc: Edits the details of the doctor identified by the index number used in the displayed list. Existing values will be overwritten by the input values.
+  Parameters: INDEX (must be a positive integer) [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS]
+  Example: editdoc 1 p/91234567 e/johndoe@example.com
+  ```
+
+  Use case resumes at step 2.
+
+* 3b. The index does not refer to any entry in the currently displayed list.
+    * 3b1. System shows: `The doctor index provided is invalid`
+
+      Use case resumes at step 2.
+
+* 3c. The edited entry is not a doctor.
+    * 3c1. System shows `The person at the specified index is not a doctor.`
+
+      Use case resumes at step 2.
+
+* 4a. The name contains invalid characters.
+    * 4a1. System shows: `Names should only contain letters, and may include single spaces, apostrophes, or hyphens between words. Name should not be blank`
+
+      Use case resumes at step 3.
+
+* 4b. The phone number contains non-numeric characters or is fewer than 3 digits.
+    * 4b1. System shows: `Phone numbers should only contain numbers, and it should be at least 3 digits long`
+
+      Use case resumes at step 3.
+
+* 4c. The email is not in a valid format.
+    * 4c1. System shows the same email validation error message as "Add a doctor" use case.
+
+      Use case resumes at step 3.
+
+* 4d. The updated name and email or phone conflicts with an existing doctor's details.
+    * 4d1. System shows: `This doctor already exists in the app`
+
+      Use case resumes at step 3.
+
+---
+
+**Use case: Delete a doctor**
+
+**MSS**
+
+1. Receptionist views the list.
+2. System displays the list with indices.
+3. Receptionist enters the `deldoc` command with the target index.
+4. System deletes the doctor entry and confirms with the deleted record's details.
+
+   Use case ends.
+
+**Extensions**
+
+* 2a. The list is empty.
+
+  Use case ends.
+
+* 3a. A name is entered instead of an index.
+    * 3a1. System shows:
+  ```
+  Invalid command format!
+  deldoc: Deletes the doctor identified by the index number used in the displayed doctor list.
+  Parameters: INDEX (must be a positive integer)
+  Example: deldoc 1
+  ```
+
+  Use case resumes at step 2.
+
+* 3b. The index does not refer to any entry in the currently displayed list.
+    * 3b1. System shows: `The doctor index provided is invalid`
+
+      Use case resumes at step 2.
+
+* 3c. The deleted entry is not a doctor.
+    * 3c1. System shows `The person at the specified index is not a doctor.`
+
+      Use case resumes at step 2.
 
 ---
 
@@ -367,7 +503,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 **MSS**
 
-1. Receptionist enters the add patient command with name, phone, and email.
+1. Receptionist enters the add patient command with name, phone, email, and address.
 2. System validates all fields.
 3. System adds the patient and confirms with patient details.
 
@@ -380,13 +516,13 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
     Use case resumes at step 1.
 
-* 2b. The phone number is not exactly 8 digits.
-  * 2b1. System shows: `Phone numbers should only contain numbers, and it should be 8 digits long`
+* 2b. The phone number contains non-numeric characters or is fewer than 3 digits.
+  * 2b1. System shows: `Phone numbers should only contain numbers, and it should be at least 3 digits long`
 
     Use case resumes at step 1.
 
 * 2c. The email is not in a valid format.
-  * 2c1. System shows: 
+  * 2c1. System shows:
   ```
       Emails should be of the format local-part@domain and adhere to the following constraints:
     1. The local-part should only contain alphanumeric characters and these special characters, excluding the parentheses, (+_.-). The local-part may not start or end with any special characters.
@@ -400,9 +536,110 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
     Use case resumes at step 1.
 
 * 2d. A patient with the same name (case-insensitive) and same email already exists.
-  * 2d1. System shows: `A patient with the same name and email already exists in the app`
+  * 2d1. System shows: `This patient already exists in the app`
 
     Use case ends.
+
+---
+
+**Use case: Edit a patient**
+
+**MSS**
+
+1. Receptionist views the list.
+2. System displays the list with indices.
+3. Receptionist enters the `editpat` command with the target index and the fields to update (name, phone, email, and/or address).
+4. System validates all provided fields.
+5. System updates the patient entry and confirms with the updated record's details.
+
+   Use case ends.
+
+**Extensions**
+
+* 2a. The list is empty.
+
+  Use case ends.
+
+* 3a. A name is entered instead of an index.
+    * 3a1. System shows:
+  ```
+  Invalid command format!
+  editpat: Edits the details of the patient identified by the index number used in the displayed list. Existing values will be overwritten by the input values.
+  Parameters: INDEX (must be a positive integer) [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS]
+  Example: editpat 1 p/91234567 e/johndoe@example.com
+  ```
+
+  Use case resumes at step 2.
+
+* 3b. The index does not refer to any entry in the currently displayed list.
+    * 3b1. System shows: `The patient index provided is invalid`
+
+      Use case resumes at step 2.
+
+* 3c. The edited entry is not a patient.
+    * 3c1. System shows `The person at the specified index is not a patient.`
+
+      Use case resumes at step 2.
+
+* 4a. The name contains invalid characters.
+    * 4a1. System shows: `Names should only contain letters, and may include single spaces, apostrophes, or hyphens between words. Name should not be blank`
+
+      Use case resumes at step 3.
+
+* 4b. The phone number contains non-numeric characters or is fewer than 3 digits.
+    * 4b1. System shows: `Phone numbers should only contain numbers, and it should be at least 3 digits long`
+
+      Use case resumes at step 3.
+
+* 4c. The email is not in a valid format.
+    * 4c1. System shows the same email validation error message as "Add a patient" use case.
+
+      Use case resumes at step 3.
+
+* 4d. The updated name and email conflict with an existing patient's details.
+    * 4d1. System shows: `This patient already exists in the app`
+
+      Use case resumes at step 3.
+
+---
+
+**Use case: Delete a patient**
+
+**MSS**
+
+1. Receptionist views the list.
+2. System displays the list with indices.
+3. Receptionist enters the `delpat` command with the target index.
+4. System deletes the patient entry and confirms with the deleted record's details.
+
+   Use case ends.
+
+**Extensions**
+
+* 2a. The list is empty.
+
+  Use case ends.
+
+* 3a. A name is entered instead of an index.
+    * 3a1. System shows:
+  ```
+  Invalid command format!
+  delpat: Deletes the patient identified by the index number used in the displayed patient list.
+  Parameters: INDEX (must be a positive integer)
+  Example: delpat 1
+  ```
+
+  Use case resumes at step 2.
+
+* 3b. The index does not refer to any entry in the currently displayed list.
+    * 3b1. System shows: `The patient index provided is invalid`
+
+      Use case resumes at step 2.
+
+* 3c. The deleted entry is not a patient.
+    * 3c1. System shows `The person at the specified index is not a patient.`
+
+      Use case resumes at step 2.
 
 ---
 
@@ -412,7 +649,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 1. Receptionist enters the view schedule command with a doctor name, doctor id and optionally a date.
 2. System validates the doctor name and id (and, if exists, the date).
-3. System displays all half-hourly slots for that doctor for next 7 days or on a specific date, each marked as Available or Booked (with patient name and appt id).
+3. System displays all half-hourly slots for that doctor for next 7 days or on a specific date, each marked as Available or Booked (with patient name, patient id and appointment id).
 
    Use case ends.
 
@@ -424,7 +661,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
     Use case ends.
 
 * 2b. The date is in an invalid format.
-  * 2b1. System shows: 
+  * 2b1. System shows:
   ```
   Invalid command format!
   viewsched: Views the schedule of a doctor (optionally for a specific date).
@@ -454,13 +691,13 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 **Extensions**
 
-* 3a. The patient name does not match any existing patient.
-  * 3a1. System shows: `Patient not found: INDEX`
+* 3a. The patient ID does not match any existing patient.
+  * 3a1. System shows: `Patient not found: <ID>`
 
     Use case ends.
 
-* 3b. The doctor name does not match any existing doctor.
-  * 3b1. System shows: `Doctor not found: INDEX`
+* 3b. The doctor ID does not match any existing doctor.
+  * 3b1. System shows: `Doctor not found: <ID>`
 
     Use case ends.
 
@@ -470,8 +707,8 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
     Use case resumes at step 2.
 
-* 3d. The time is not one of the valid hourly slots (09:00–16:00).
-  * 3d1. System shows: `Please choose a time within operating hours`
+* 3d. The time is not one of the valid half-hourly slots (09:00–16:30).
+  * 3d1. System shows: `The time <HH:MM> is not a valid 30-minute slot for this doctor.`
 
     Use case resumes at step 2.
 
@@ -487,43 +724,122 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 ---
 
-**Use case: Delete a doctor**
+**Use case: Edit an appointment**
 
 **MSS**
 
-1. Receptionist views the list.
-2. System displays the list with indices.
-3. Receptionist enters the `deldoc` command with the target index.
-4. System deletes the doctor entry and confirms with the deleted record's details.
+1. Receptionist views a doctor's schedule (see Use case: View a doctor's schedule).
+2. Receptionist identifies an appointment to edit.
+3. Receptionist enters the `editappt` command with the appointment ID and the fields to update (doctor ID, date, and/or time).
+4. System validates all provided fields and checks slot availability.
+5. System updates the appointment entry and confirms with the updated record's details.
 
    Use case ends.
 
 **Extensions**
 
-* 2a. The list is empty.
+* 3a. The appointment ID does not exist.
+  * 3a1. System shows: `Appointment not found: <ID>`
 
-  Use case ends.
+    Use case ends.
 
-* 3a. A name is entered instead of an index.
-  * 3a1. System shows: 
+* 4a. The doctor ID does not match any existing doctor.
+  * 4a1. System shows: `Doctor not found: <ID>`
+
+    Use case resumes at step 3.
+
+* 4b. The date is invalid or in the past.
+  * 4b1. System shows the appropriate date validation error message.
+
+    Use case resumes at step 3.
+
+* 4c. The time is not one of the valid half-hourly slots (09:00–16:30).
+  * 4c1. System shows: `Could not edit appointment: There is no such time slot.`
+
+    Use case resumes at step 3.
+
+* 4d. The selected slot is already booked with the doctor.
+  * 4d1. System shows: `Could not edit appointment: This slot is already booked. Please edit the appointment if you wish to change it`
+
+    Use case resumes at step 3.
+
+* 4e. The patient already has an appointment at the new date and time.
+  * 4e1. System shows: `Could not edit appointment: Patient already has an appointment at this time`
+
+    Use case resumes at step 3.
+
+---
+
+**Use case: Delete an appointment**
+
+**MSS**
+
+1. Receptionist views a doctor's schedule (see Use case: View a doctor's schedule).
+2. Receptionist identifies an appointment to delete.
+3. Receptionist enters the `delappt` command with the appointment ID.
+4. System deletes the appointment entry and confirms with the deleted record's details.
+
+   Use case ends.
+
+**Extensions**
+
+* 3a. The appointment ID does not exist.
+  * 3a1. System shows: `Appointment not found: ID`
+
+    Use case ends.
+
+* 3b. The appointment ID format is invalid (e.g. id input: `abc`).
+  * 3b1. System shows:
   ```
   Invalid command format!
-  deldoc: Deletes the doctor identified by the index number used in the displayed doctor list.
-  Parameters: INDEX (must be a positive integer)
-  Example: deldoc 1
+  delappt: Deletes the appointment identified by the appointment ID.
+  Parameters: apptid/APPOINTMENT_ID
+  Example: delappt apptid/1
   ```
 
-    Use case resumes at step 2.
+    Use case ends.
 
-* 3b. The index does not refer to any entry in the currently displayed list.
-  * 3b1. System shows: `The doctor index provided is invalid`
+---
 
-    Use case resumes at step 2.
+**Use case: Find persons**
 
-* 3c. The deleted entry is not a doctor.
-  * 3c1. System shows `The person at the specified index is not a doctor.`
+**MSS**
 
-    Use case resumes at step 2.
+1. Receptionist enters the `find` command with one or more search keywords.
+2. System searches for persons (patients or doctors) matching the keywords.
+3. System displays a filtered list of all matching persons with their indices.
+
+   Use case ends.
+
+**Extensions**
+
+* 1a. The search keywords are empty.
+  * 1a1. System shows:
+  ```
+  Invalid command format!
+  find: Finds all persons whose names contain any of the specified keywords (case-insensitive) and displays them as a list with index numbers.
+  Parameters: KEYWORD [MORE_KEYWORDS]...
+  Example: find alice bob charlie
+  ```
+
+    Use case ends.
+
+* 2a. No persons match the search criteria.
+  * 2a1. System displays an empty list and shows: `0 persons listed!`
+
+    Use case ends.
+
+* 2b. Multiple persons match the search criteria.
+  * 2b1. System displays all matching persons in a filtered list with their indices.
+
+    Use case ends.
+
+* 2c. The search matches both patients and doctors.
+  * 2c1. System displays all matching persons from both categories.
+
+    Use case ends.
+
+---
 
 ### Non-Functional Requirements
 
@@ -538,7 +854,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 * **Mainstream OS**: Windows, Linux, Unix, MacOS
 * **Private contact detail**: A contact detail that is not meant to be shared with others
-* **Slot**: A time slot (30-minute intervals from 09:00 to 17:00, with the last slot at 16:30) in a doctor's schedule
+* **Slot**: A time slot (30-minute intervals from 09:00 to 16:30) in a doctor's schedule
 * **Schedule**: A calendar of available and booked time slots for a doctor
 * **Patient ID**: A unique auto-generated identifier for each patient (e.g., 1, 2, 3, ...)
 * **Doctor ID**: A unique auto-generated identifier for each doctor (e.g., 1, 2, 3, ...)
@@ -563,11 +879,11 @@ testers are expected to do more *exploratory* testing.
 
    1. Download the jar file and copy into an empty folder
 
-   2. Open a terminal and run `cd PATH_TO_FOLDER` to change directory to the location of the jar file. 
-   
+   2. Open a terminal and run `cd PATH_TO_FOLDER` to change directory to the location of the jar file.
+
    3. Run the command `java -jar clinicdesk.jar` to launch the app.<br>
        Expected: App launches successfully without any error.
-   
+
 1. Saving window preferences
 
    1. Resize the window to an optimum size. Move the window to a different location. Close the window.
@@ -583,7 +899,7 @@ testers are expected to do more *exploratory* testing.
    1. Prerequisites: List all persons using the `list` command. Multiple persons in the list. Doctor is first person in the list.
 
    2. Test case: `deldoc 1`<br>
-      Expected: Doctor at index 1 is deleted from the list. Details of the deleted contact shown in the status message. 
+      Expected: Doctor at index 1 is deleted from the list. Details of the deleted contact shown in the status message.
 
    3. Test case: `deldoc 0`<br>
       Expected: No person is deleted. Error details shown in the status message.
@@ -595,21 +911,20 @@ testers are expected to do more *exploratory* testing.
 ### Saving data
 
 1. Dealing with missing data files
-   1. When a data file (patients.json, doctors.json, schedule.json) is missing, the app starts with an empty data container for that file. 
-   
-   2. The app will continue to function normally, but there is no data loaded for that file. 
-   
+   1. When a data file (patients.json, doctors.json, schedule.json) is missing, the app starts with an empty data container for that file.
+
+   2. The app will continue to function normally, but there is no data loaded for that file.
+
    3. Example: If patients.json is missing, the app starts with no patients but continues to function normally.
 
-2. Dealing with corrupted data files 
-   1. If a data file exists but contains invalid JSON format or illegal values, no data will be loaded. 
-   
+2. Dealing with corrupted data files
+   1. If a data file exists but contains invalid JSON format or illegal values, no data will be loaded.
+
    2. To solve this, the user can either fix the corrupted file (e.g., by correcting the JSON format or values) or delete the corrupted file to start with an empty data container for that file before relaunching the app.
-   
+
    3. Example: If patients.json contains malformed JSON, the app will discard it and start with no data entry.
 
 **Data loss prevention:**
 - Make regular backups of the `data/` folder
 - Only edit JSON files if you understand the structure
 - Corrupted files are not repaired automatically; deleted data cannot be recovered
-
