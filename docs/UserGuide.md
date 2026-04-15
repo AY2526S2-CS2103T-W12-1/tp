@@ -259,16 +259,16 @@ Format: `viewsched d/DOCTOR_NAME id/DOCTOR_ID [date/YYYY-MM-DD]`
 * Appointment slots are displayed in half-hourly intervals from 09:00 to 16:30.
 * The schedule panel uses light blocks for available slots and darker blocks for booked slots.
 
-**Caution**
-If the schedule panel does not show the full slot details with appointment ID and patient ID on your OS, please drag and resize it using the double-headed arrow when you hover near the corner of the window.
+**Caution:**
+In case the schedule panel does not display the full slot details (appointment ID and patient ID), please resize the window by dragging from the corner using the double-headed arrow.
 
 Examples:
-* `viewsched d/John Tan id/1 date/2026-04-10` displays John Tan's schedule on 10 Apr 2026.
-* `viewsched d/Alice Lim id/2` displays Alice Lim's schedule for the next 7 days.
+* `viewsched d/Spencer id/1 date/2026-04-14` displays Dr. Spencer's schedule on 14 Apr 2026.
+* `viewsched d/Alice Lim id/2` displays Dr. Alice Lim's schedule for the next 7 days.
 
 Expected output:
 ```
-Schedule for John Tan (ID: 1) on 2026-04-10
+Schedule for Spencer (ID: 1) on 2026-04-14
 ```
 
 <div class="image-container">
